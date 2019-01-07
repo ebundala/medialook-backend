@@ -1,0 +1,25 @@
+{
+  "name": "medialook",
+  "version": "1.0.0",
+  "description": "backend to fetch rss feeds and write to database",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "rss",
+    "reader"
+  ],
+  "author": "ebundala",
+  "license": "MIT",
+  "dependencies": {
+    "davefeedread": "^0.4.14",
+    "es6-promise": "^4.2.5",
+    "express": "^4.16.4",
+    "orientjs": "^3.0.2",
+    "rss-finder": "^2.0.6",
+    "rss-parser": "^3.6.1",
+    "sequential-task-queue": "^1.2.1",
+    "validator": "^10.10.0"
+  }
+}
