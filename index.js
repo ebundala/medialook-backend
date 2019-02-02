@@ -2,15 +2,17 @@
  * Created by ebundala on 1/4/2019.
  */
 const Express =require('express');
-const Parser =require('rss-parser');
+//const Parser =require('rss-parser');
 const RssDiscover=require('rss-finder');
 const FeedParser=require("davefeedread");
 const validator = require('validator');
 const OrientDB = require('orientjs');
 const SequentialTaskQueue=require('sequential-task-queue').SequentialTaskQueue;
+const striptags = require('striptags');
 const app = Express();
 const port = 3000;
 const timeOutSecs = 30;
+
 
 const mediaQueue = new SequentialTaskQueue();
 const feedsQueue = new SequentialTaskQueue();
@@ -78,8 +80,6 @@ app.get("/validate/feed",(req,res)=>{
             }).catch((e)=>{
                 res.json(errorResponse(e.code,e.code,e.message))
             })
-
-
     }
     else{
         res.json(errorResponse(400,400,"invalid url"))
@@ -92,9 +92,18 @@ app.get("/refreshfeeds",(req,res)=>{
         res.json(errorResponse(400,400,"failed to connect to database"))
     }
     const sql="select feedUrls,mediaName,@rid from OMedia ";
-    req.db.query(sql).then((result)=>{
+    const categoriesSql="select from OCategory";
+    req.db.query(categoriesSql).then((categories)=>{
+
+    return req.db.query(sql).then((medias)=>{
+
+
+        return {medias,categories}
+    })
+    }
+    ).then((result)=>{
         queue.push(result);
-        res.json(successResponse(result.length));
+        res.json(successResponse(result.medias.length));
 
     }).catch ((e)=>{
         console.error(e)
@@ -107,10 +116,24 @@ app.get("/refreshfeeds",(req,res)=>{
 
 });
 
+app.get("/validate/media",(req,res)=>{
+    let url=req.query.url;
+    let feedUrls=req.query.feedUrls;
+    let uid=req.query.uid;
+    let sql="select *,in_OFollow.out[@rid=:uid].size() as followed from OMedia where feedUrls=:feedUrls OR url=:url";
+    console.log(url,"\n",feedUrls,"\n",uid);
+    req.db.query(sql,{params:{feedUrls:feedUrls,url:url,uid:uid}}).then((result)=>{
+        res.json(successResponse(result));
+    }).catch((e)=>{
+        res.json(errorResponse(e.code,e.code,e.message));
+    }).finally(()=>{
+        console.log("complete validating ",url);
+    })
+});
 
 function processRefresh(result){
-    console.log(result.length);
-    result.map((media,i,all)=>{
+    console.log(result.medias.length,result.categories.length);
+    result.medias.map((media,i,all)=>{
         mediaQueue.push(()=>{
             console.log("process media ",i)
             media.feedUrls=JSON.parse(media.feedUrls);
@@ -120,7 +143,8 @@ function processRefresh(result){
                     fetchFeeds(feed).then((feedContent)=>{
                         feedContent.items.map((post,i,posts)=>{
                             postQueue.push(()=>{
-                                savePostToDB(post,media);
+                                const categories=result.categories;
+                                savePostToDB(post,media,categories);
 
                             })
                         })
@@ -137,7 +161,7 @@ function processRefresh(result){
 
 }
 
-function savePostToDB(post,media) {
+function savePostToDB(post,media,categories) {
 
     const Server = OrientDB({
         host:     'localhost',
@@ -154,7 +178,7 @@ function savePostToDB(post,media) {
     });
 
 
-    let query=buildQuery(post,media);
+    let query=buildQuery(post,media,categories);
    return db.query(query.sql,
         {   class: 's',
             params:query.params
@@ -165,14 +189,40 @@ function savePostToDB(post,media) {
    })
 
 }
+function findCategories(post,categories){
+    return categories.filter((x) => {
+     return post.categories.find((t,i,arr)=>{
+            let pattern=new RegExp(x.categoryName,"gi");
+           // console.log("testing",t);
+            return t.toString().match(pattern);
+        });
 
-function buildQuery(post,media){
+    });
+
+}
+function buildQuery(post,media,categories){
+    let category=findCategories(post,categories);
+    if(category.length==0){
+        post.categories.push("Breaking news");
+        category=findCategories(post,categories);
+    }
+
+    let categorySql;
+    let categoryEdges= category.map((t,i,arr)=>{
+       // console.log("rid is ",t["@rid"]);
+        let recordId=t["@rid"];
+        let rid=recordId.cluster+":"+recordId.position;
+       return "let c"+1+"=create EDGE OBelong from $b to "+rid+";";
+    });
+
+     categorySql=categoryEdges.join("\n");
+
+    console.log("categories found",category);
     let sql="begin;\n" +
         "let a=select from OPost where ";
 
     if(post.guid){
         sql=sql+"guid=':guid'";
-
     }
     else{
         sql=sql+"link=':link'";
@@ -186,15 +236,26 @@ function buildQuery(post,media){
         "createdAt=sysdate('yyyy-MM-dd HH:mm:ss'),"+
         "updatedAt=:pubdate,"+
         "description=:description,"+
+        "enclosures=:enclosures,"+
         "image=:image,"+
         "link=:link,"+
         "pubDate	=:pubDate,"+
         "summary=:summary;\n"+
     "let c=create EDGE OPublish from :mediaId to $b;\n"+
+        categorySql+
     "commit retry 5;"+
     "return $b;";
 
     post["mediaId"]=media.rid;
+	if(post.summary){
+	post.summary=striptags(post.summary);
+	}
+    if(post.image){
+        post.image=JSON.stringify(post.image);
+    }
+	if(post.description){
+	post.description=striptags(post.description);
+	}
     return{"sql":sql,params:post};
 }
 
