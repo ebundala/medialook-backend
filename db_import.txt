@@ -1,4 +1,4 @@
-CREATE DATABASE remote:178.128.161.9/zmedialook root sosote16 plocal graph;
+CREATE DATABASE remote:178.128.161.9/medialook root sosote16 plocal graph;
 IMPORT DATABASE ./medialook.json.gz; 
 CREATE DATABASE remote:178.128.161.9/zbizapp root sosote16 plocal graph;
 IMPORT DATABASE ./zbizapp.json.gz; 
