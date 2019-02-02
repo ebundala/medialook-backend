@@ -1,0 +1,16 @@
+      select
+        *,
+      in_OLike.size() as likes,
+      in_OLike.out[@rid=:rid].size() as liked,
+      in_OShare.size() as shares,
+      in_OShare.out[@rid=:rid].size() as shared,
+      in_OPublish.out.mediaName[0] as mediaName,
+      in_OPublish.out.url[0] as mediaUrl,
+      in_OPublish.out.featuredImage[0] as featuredImage
+      from  OPost
+
+
+
+
+      order by pubDate desc
+      skip :skip limit :limit
