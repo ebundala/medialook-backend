@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db:
+    image: orientdb:3.0.4    
+    environment:
+      ORIENTDB_ROOT_PASSWORD: sosote16
+      ORIENTDB_NODE_NAME: "odb1"
+      ORIENTDB_OPTS_MEMORY: "-Xms128m -Xmx1G"    
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 2480:2480
+      - 2424:2424
+    networks:
+      - webnet
+    volumes:
+      - db:/orientdb/databases
+      - bk:/orientdb/backup
+   # - config: orientdb/config
+   # logging:
+   #   driver: json-file
+   #   options: 
+    #    max-size: "200k"
+    #    max-file: "10"
+volumes:
+  db: 
+  bk: 
+#  config:  
+networks:
+  webnet:
