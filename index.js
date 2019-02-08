@@ -7,17 +7,24 @@ const RssDiscover=require('rss-finder');
 const FeedParser=require("davefeedread");
 const validator = require('validator');
 const OrientDB = require('orientjs');
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccount/serviceAccount.json');
+
 const SequentialTaskQueue=require('sequential-task-queue').SequentialTaskQueue;
 const striptags = require('striptags');
 const app = Express();
 const port = 3000;
 const timeOutSecs = 30;
-
-
 const mediaQueue = new SequentialTaskQueue();
 const feedsQueue = new SequentialTaskQueue();
 const postQueue = new SequentialTaskQueue();
 let queue=[];
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://medialook.firebaseio.com"
+});
+
 app.use((req,res,next)=>{
     req.dbServer = OrientDB({
         host:     'localhost',
@@ -131,12 +138,108 @@ app.get("/validate/media",(req,res)=>{
     })
 });
 
+
+app.post("/signup",(req,res)=>{
+  
+    if(!req.db){
+        res.json(errorResponse(400,400,"failed to connect to database"))
+    }
+
+  let headers=req.headers
+  if(headers.authorization){
+       let authorization=headers.authorization.split(" ")[1];
+       console.log(headers.authorization)
+       admin.auth().verifyIdToken(authorization).then((claims)=>{
+           console.log("claims....start.......\n",claims,"\n..........claims.....end\n")
+        return admin.auth().getUser(claims.uid).then((userRecord) => {
+            // The claims can be accessed on the user record.
+            let customClaims=userRecord.customClaims;
+            console.log("useridClaims ",customClaims?customClaims.rid:"")
+
+           if(!(customClaims&&customClaims.rid))
+           {
+               let sql=`INSERT INTO user SET 
+               name=:name, 
+               password=:password,
+               uid=:uid,
+               email=:email,
+               firstName=:firstName,
+               surName=:surName, 
+               gender=:gender, 
+               dob=:dob ,
+               country=:country,
+               avator=:avator, 
+               status=:status,
+               createdAt=sysdate('yyyy-MM-dd HH:mm:ss'),
+               roles=(select from ORole where name=:userRole)
+               `;
+               
+               let names=[];
+               if(userRecord.displayName){
+                 names=userRecord.displayName.split(" ")
+               }
+               if(!(names.length>0)){
+                let emailSubstr=userRecord.email.split("@")
+                names.push(emailSubstr[0])
+               }      
+               let params={
+                "name":userRecord.email,//names.length>0?names[0]:"",
+                "password":userRecord.uid,
+                "uid":userRecord.uid,
+                "email":userRecord.email,
+                "firstName":names.length>0?names[0]:"",
+                "surName":names.length>1?names[1]:"",
+                //"gender":userRecord.,
+                //"dob":userRecord.d,
+                //"country":country,
+                "avator":userRecord.photoURL,
+                "userRole":"admin",
+                "status":"ACTIVE"
+              }
+              return req.db.query(sql,{params}).then((user)=>{
+                let recordId=user[0]["@rid"];
+                  console.log("new user rid ",user,"\n",recordId)
+                  let rid=recordId.cluster+":"+recordId.position;
+
+               
+               return admin.auth().setCustomUserClaims(userRecord.uid,{rid:rid})
+                .then(()=>{
+                        res.json(successResponse({"uid":userRecord.uid,"rid":rid}))
+                })
+              })
+           }
+           else{
+            res.json(successResponse({"uid":claims.uid,"rid":customClaims.rid}))
+           }
+        });
+       }).catch((e)=>{
+           console.error(e)
+        res.json(errorResponse(e.code,e.code,e.message))
+    })
+       
+  }
+  else{
+      res.json(errorResponse(401,401,"unauthorized"))
+  }
+    
+})
+
+function createUserWithToken(claims,db){
+    if(claims){
+
+    }
+}
+
+
+
+
+
 function processRefresh(result){
     console.log(result.medias.length,result.categories.length);
     result.medias.map((media,i,all)=>{
         mediaQueue.push(()=>{
             console.log("process media ",i)
-            media.feedUrls=JSON.parse(media.feedUrls);
+            media.feedUrls=media.feedUrls;
             media.feedUrls.map((feed,i,_feeds)=>{
                 feedsQueue.push(()=>{
                     console.log("feching feed ",i);
