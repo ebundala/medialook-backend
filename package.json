@@ -17,6 +17,7 @@
     "es6-promise": "^4.2.5",
     "express": "^4.16.4",
     "firebase-admin": "^7.0.0",
+    "http-proxy": "^1.17.0",
     "orientjs": "^3.0.2",
     "rss-finder": "^2.0.6",
     "sequential-task-queue": "^1.2.1",

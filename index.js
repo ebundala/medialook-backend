@@ -1,6 +1,8 @@
 /**
  * Created by ebundala on 1/4/2019.
  */
+var httpProxy = require('http-proxy');
+var apiProxy = httpProxy.createProxyServer();
 const Express =require('express');
 //const Parser =require('rss-parser');
 const RssDiscover=require('rss-finder');
@@ -9,9 +11,12 @@ const validator = require('validator');
 const OrientDB = require('orientjs');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccount/serviceAccount.json');
-
 const SequentialTaskQueue=require('sequential-task-queue').SequentialTaskQueue;
 const striptags = require('striptags');
+
+
+
+
 const app = Express();
 const port = 3000;
 const timeOutSecs = 30;
@@ -139,8 +144,41 @@ app.get("/validate/media",(req,res)=>{
 });
 
 
-app.post("/signup",(req,res)=>{
-  
+app.post("/signup",createUserWithToken)
+
+
+app.all("*",(req,res)=>{
+    let authorization=req.headers.authorization.split(" ");
+    delete req.headers.authorization;
+    if(authorization.length==2){
+    let token=authorization[1]
+   // console.log("bearer token \n",token)    
+     admin.auth().verifyIdToken(token).then((claims)=>{
+         if(!claims.rid){
+         throw Error("claims dont have rid")
+         }else{
+            apiProxy.web(req,res,{
+                target: 'http://127.0.0.1:2480',
+                auth:`${claims["email"]}:${claims["user_id"]}`,//Todo switch to current user credentials
+                followRedirects:true,
+                xfwd:false
+            })
+         }
+
+     }).catch((e)=>{
+         console.error(errorResponse(e.code,401,e.message))
+         res.json(errorResponse(e.code,401,e.message))
+     })
+    
+   }else{
+       console.log(errorResponse("Unauthorized",401,"no authorization token"))
+   res.json(errorResponse("Unauthorized",401,"no authorization token"))
+   }
+})
+
+
+
+function createUserWithToken(req,res){
     if(!req.db){
         res.json(errorResponse(400,400,"failed to connect to database"))
     }
@@ -199,13 +237,15 @@ app.post("/signup",(req,res)=>{
               return req.db.query(sql,{params}).then((user)=>{
                 let recordId=user[0]["@rid"];
                   console.log("new user rid ",user,"\n",recordId)
-                  let rid=recordId.cluster+":"+recordId.position;
+                      if(recordId){
+                  let rid=`#${recordId.cluster}:${recordId.position}`; 
 
-               
-               return admin.auth().setCustomUserClaims(userRecord.uid,{rid:rid})
+               return admin.auth().setCustomUserClaims(userRecord.uid,{rid:rid})                    
                 .then(()=>{
                         res.json(successResponse({"uid":userRecord.uid,"rid":rid}))
                 })
+            }
+            throw Error("Failed to create user")
               })
            }
            else{
@@ -219,20 +259,9 @@ app.post("/signup",(req,res)=>{
        
   }
   else{
-      res.json(errorResponse(401,401,"unauthorized"))
+      res.json(errorResponse(401,401,"Unauthorized"))
   }
-    
-})
-
-function createUserWithToken(claims,db){
-    if(claims){
-
-    }
 }
-
-
-
-
 
 function processRefresh(result){
     console.log(result.medias.length,result.categories.length);
@@ -388,3 +417,10 @@ function successResponse(data) {
 }
 
 app.listen(port, () => console.log(`app listening on port ${port}!`))
+
+
+
+
+
+
+  
