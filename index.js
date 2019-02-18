@@ -148,7 +148,8 @@ app.post("/signup",createUserWithToken)
 
 
 app.all("*",(req,res)=>{
-    let authorization=req.headers.authorization.split(" ");
+    let authorization=req.headers.authorization 
+    .split(" ");
     delete req.headers.authorization;
     if(authorization.length==2){
     let token=authorization[1]
