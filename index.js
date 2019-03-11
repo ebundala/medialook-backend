@@ -78,6 +78,7 @@ app.get('/validate/url', (req, res) => {
 
 app.get("/validate/feed",(req,res)=>{
     let url=req.query.url;
+    console.log("validating feed ",url)
     if(validator.isURL(url)){
         let pr= new Promise((resolve,reject)=>{
             FeedParser.parseUrl(url,timeOutSecs,(e,result)=>{
@@ -154,12 +155,12 @@ app.all("*",(req,res)=>{
     if(authorization.length==2){
     let token=authorization[1]
    // console.log("bearer token \n",token)    
-    // admin.auth().verifyIdToken(token).then((claims)=>{
-        let claims={
+     admin.auth().verifyIdToken(token).then((claims)=>{
+        /*let claims={
             "user_id":"admin",
             "email":"admin",
             "rid":"#5:0"
-        }
+        }*/
          if(!claims.rid){
          throw Error("claims dont have rid")
          }else{
@@ -171,10 +172,10 @@ app.all("*",(req,res)=>{
             })
          }
 
-    /* }).catch((e)=>{
+     }).catch((e)=>{
          //console.error(errorResponse("the error occured",e.code,401,e.message))
          res.json(errorResponse(e.code,401,e.message))
-     })*/
+     })
     
    }else{
        console.log(errorResponse("Unauthorized",401,"no authorization token"))
