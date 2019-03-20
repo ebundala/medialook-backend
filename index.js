@@ -89,7 +89,7 @@ app.get("/validate/feed",(req,res)=>{
                 }
             })
        }).then((result)=>{
-                res.json(successResponse(result.items[0]))
+                res.json(successResponse(result))
             }).catch((e)=>{
                 res.json(errorResponse(e.code,e.code,e.message))
             })
