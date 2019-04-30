@@ -1,28 +1,57 @@
 /**
  * Created by ebundala on 1/4/2019.
  */
-var httpProxy = require('http-proxy');
-var apiProxy = httpProxy.createProxyServer();
+const { timeOutSecs, ServerConfig, RabbitMqSettings, MediaQueue, dbHost, PostQueue } = require('./config')
+const httpProxy = require('http-proxy');
+const apiProxy = httpProxy.createProxyServer();
 const Express = require('express');
-//const Parser =require('rss-parser');
 const RssDiscover = require('rss-finder');
 const FeedParser = require("davefeedread");
 const validator = require('validator');
 const OrientDB = require('orientjs');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccount/serviceAccount.json');
-const SequentialTaskQueue = require('sequential-task-queue').SequentialTaskQueue;
-const striptags = require('striptags');
+const amqplib = require('amqplib');
 
 
+const mediaQueueTask = (timeout = timeOutSecs) => {
+    try {
+        const open = amqplib.connect(RabbitMqSettings);
+        let timerHandle;
+        open.then(function (conn) {
+            return conn.createChannel();
+        }).then(function (ch) {
+            //send single media message per sec
+            timerHandle = setInterval(() => {
+                if (queue.length) {
+                    ch.assertQueue(MediaQueue).then((ok) => {
+                        console.time("queing media");
+                        ch.sendToQueue(MediaQueue, Buffer.from(JSON.stringify(queue.pop())));
+                        console.timeEnd("queing media");
+                    });
+                }
+            }, 250)
 
+        }).catch((e) => {
+            clearInterval(timerHandle);
+            console.error(e)
+            throw e;
+        });
+    }
+    catch (e) {
+        console.error(e)
+        console.log("retrying in ")
+        setTimeout(() => {
+            console.log("retrying ")
+            mediaQueueTask(2 * timeout);
+        }, 50 * timeout)
+    }
+
+}
 
 const app = Express();
 const port = 3000;
-const timeOutSecs = 30;
-const mediaQueue = new SequentialTaskQueue();
-const feedsQueue = new SequentialTaskQueue();
-const postQueue = new SequentialTaskQueue();
+
 let queue = [];
 
 admin.initializeApp({
@@ -31,13 +60,7 @@ admin.initializeApp({
 });
 
 app.use((req, res, next) => {
-    req.dbServer = OrientDB({
-        host: 'localhost',
-        port: 2424,
-        username: 'root',
-        password: 'kiazi',
-        useToken: true
-    });
+    req.dbServer = OrientDB(ServerConfig);
 
     req.db = req.dbServer.use({
         name: 'medialook',
@@ -49,14 +72,7 @@ app.use((req, res, next) => {
     next();
 });
 
-setInterval(() => {
-    if (queue.length) {
-        console.time("refreshing");
-        let result = queue.pop();
-        processRefresh(result);
-        console.timeEnd("refreshing");
-    }
-}, 5000)
+
 
 app.get('/validate/url', (req, res) => {
     let url = req.query.url;
@@ -104,26 +120,24 @@ app.get("/refreshfeeds", (req, res) => {
     if (!req.db) {
         res.json(errorResponse(400, 400, "failed to connect to database"))
     }
-    const sql = "select feedUrls,mediaName,@rid from OMedia ";
-    const categoriesSql = "select from OCategory";
-    req.db.query(categoriesSql).then((categories) => {
-
-        return req.db.query(sql).then((medias) => {
+    const sql = "select feedUrl,mediaName,@rid from OMedia ";
 
 
-            return { medias, categories }
-        })
-    }
-    ).then((result) => {
-        queue.push(result);
-        res.json(successResponse(result.medias.length));
+    req.db.query(sql).then((medias) => {
 
-    }).catch((e) => {
-        console.error(e)
-        res.json(errorResponse(e.code, e.code, e.message));
-    }).finally(() => {
-        console.log("complete getting feeds from medias");
-    });
+        return medias
+    })
+        .then((medias) => {
+            //medias.map((item) => queue.push(item));
+            queue = medias;
+            res.json(successResponse(medias.length));
+
+        }).catch((e) => {
+            console.error(e)
+            res.json(errorResponse(e.code, e.code, e.message));
+        }).finally(() => {
+            console.log("complete getting feeds from medias");
+        });
 
 
 
@@ -167,7 +181,7 @@ app.all("*", (req, res) => {
                 throw Error("claims dont have rid")
             } else {
                 apiProxy.web(req, res, {
-                    target: 'http://127.0.0.1:2480',
+                    target: `http://${dbHost}:2480`,
                     auth: `${claims["email"]}:${claims["user_id"]}`,//Todo switch to current user credentials
                     followRedirects: true,
                     xfwd: false
@@ -201,10 +215,13 @@ function getFeeds(req, res) {
     query = query.toString().toLowerCase();
 
     let rid = req.query.rid;
-    console.log("reached", query, rid)
-    let sql = `select *,in_OFollow.out[@rid=:uid].size() as followed from OMedia where
-     feedUrl.toLowerCase() like :query OR mediaName.toLowerCase() like ':query' OR feedName.toLowerCase() like :query OR url like :query`;
-    req.db.query(sql, { params: { "query": '%' + query + '%', "uid": rid } })
+    let skip = (+req.query.skip);
+    let limit = (+req.query.limit);
+    console.log("reached", query, rid, skip, limit)
+    let sql = `select *,in_OFollow.out[@rid=:uid].size() as followed from OMedia where in_OFollow.out[@rid=:uid].size()<1 AND (
+     feedUrl.toLowerCase() like :query OR mediaName.toLowerCase() like ':query' OR feedName.toLowerCase() like :query OR url like :query)
+     order by createdAt desc skip :skip limit :limit`;
+    req.db.query(sql, { params: { "query": '%' + query + '%', "uid": rid, "skip": skip, "limit": limit } })
         .then(async (result) => {
             console.log(result);
             if (result instanceof Array && result.length > 0) {
@@ -395,155 +412,45 @@ function createUserWithToken(req, res) {
     }
 }
 
-function processRefresh(result) {
-    console.log(result.medias.length, result.categories.length);
-    result.medias.map((media, i, all) => {
-        mediaQueue.push(() => {
-            console.log("process media ", i)
-            media.feedUrls = media.feedUrls;
-            media.feedUrls.map((feed, i, _feeds) => {
-                feedsQueue.push(() => {
-                    console.log("feching feed ", i);
-                    fetchFeeds(feed).then((feedContent) => {
-                        feedContent.items.map((post, i, posts) => {
-                            postQueue.push(() => {
-                                const categories = result.categories;
-                                savePostToDB(post, media, categories);
-
-                            })
-                        })
-
-                    });
-
-
-
-                })
-
-            })
-        });
-    });
-
-}
-
-function savePostToDB(post, media, categories) {
-
-    const Server = OrientDB({
-        host: 'localhost',
-        port: 2424,
-        username: 'root',
-        password: 'kiazi',
-        useToken: true
-    });
-
-    const db = Server.use({
-        name: 'medialook',
-        username: 'medialook',
-        password: 'medialook'
-    });
-
-
-    let query = buildQuery(post, media, categories);
-    return db.query(query.sql,
-        {
-            class: 's',
-            params: query.params
-        }).then((res) => {
-            console.log(res[0].title);
-        }).catch((e) => {
-            console.error(e.message)
-        })
-
-}
-function findCategories(post, categories) {
-    return categories.filter((x) => {
-        return post.categories.find((t, i, arr) => {
-            let pattern = new RegExp(x.categoryName, "gi");
-            // console.log("testing",t);
-            return t.toString().match(pattern);
-        });
-
-    });
-
-}
-function buildQuery(post, media, categories) {
-    let category = findCategories(post, categories);
-    if (category.length == 0) {
-        post.categories.push("Breaking news");
-        category = findCategories(post, categories);
-    }
-
-    let categorySql;
-    let categoryEdges = category.map((t, i, arr) => {
-        // console.log("rid is ",t["@rid"]);
-        let recordId = t["@rid"];
-        let rid = recordId.cluster + ":" + recordId.position;
-        return "let c" + 1 + "=create EDGE OBelong from $b to " + rid + ";";
-    });
-
-    categorySql = categoryEdges.join("\n");
-
-    console.log("categories found", category);
-    let sql = "begin;\n" +
-        "let a=select from OPost where ";
-
-    if (post.guid) {
-        sql = sql + "guid=':guid'";
-    }
-    else {
-        sql = sql + "link=':link'";
-    }
-    sql = sql + ";\n" +
-        "if($a.size()>0){\n" +
-        "ROLLBACK;\n" +
-        " };\n" +
-        "let b=insert into OPost set title=:title," +
-        "guid=:guid,author=:author ," +
-        "createdAt=sysdate('yyyy-MM-dd HH:mm:ss')," +
-        "updatedAt=:pubdate," +
-        "description=:description," +
-        "enclosures=:enclosures," +
-        "image=:image," +
-        "link=:link," +
-        "pubDate	=:pubDate," +
-        "summary=:summary;\n" +
-        "let c=create EDGE OPublish from :mediaId to $b;\n" +
-        categorySql +
-        "commit retry 5;" +
-        "return $b;";
-
-    post["mediaId"] = media.rid;
-    if (post.summary) {
-        post.summary = striptags(post.summary);
-    }
-    if (post.image) {
-        post.image = JSON.stringify(post.image);
-    }
-    if (post.description) {
-        post.description = striptags(post.description);
-    }
-    return { "sql": sql, params: post };
-}
-
-
-
-
-function fetchFeeds(feed) {
-    return new Promise((resolve, reject) => {
-        FeedParser.parseUrl(feed.url, timeOutSecs, (e, result) => {
-            if (e) {
-                reject(e)
-            } else {
-                resolve(result)
-            }
-        })
-    })
-}
 
 function buildFeedSql(item, i) {
     return `let q${i} = insert into OMedia set mediaName='${item.mediaName}', url='${item.url}',
    createdAt=sysdate('yyyy-MM-dd HH:mm:ss'),
  featuredImage='${item.featuredImage}', feedUrl='${item.feedUrl}', feedName='${item.feedName}'`;
 }
+
+
+function errorResponse(reason, code, content) {
+    return [{ "errors": [{ "reason": reason, "code": code, "content": content }] }]
+
+}
+
+function successResponse(data) {
+    if (data instanceof Array) {
+        if (data.length < 1)
+            return [{ "result": [] }];
+        else
+            return [{ "result": data }];
+    }
+    return [{ "result": [data] }];
+
+}
+
+app.listen(port, () => console.log(`app listening on port ${port}!`))
+
+//start the media queing;
+mediaQueueTask();
+
+
+
+
+
+
+
+
+
+
+
 
 function migrate(req, res) {
     if (!req.db) {
@@ -587,28 +494,3 @@ function migrate(req, res) {
         res.json(errorResponse(400, 400, e))
     })
 }
-
-
-function errorResponse(reason, code, content) {
-    return [{ "errors": [{ "reason": reason, "code": code, "content": content }] }]
-
-}
-
-function successResponse(data) {
-    if (data instanceof Array) {
-        if (data.length < 1)
-            return [{ "result": [] }];
-        else
-            return [{ "result": data }];
-    }
-    return [{ "result": [data] }];
-
-}
-
-app.listen(port, () => console.log(`app listening on port ${port}!`))
-
-
-
-
-
-
