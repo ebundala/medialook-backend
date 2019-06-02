@@ -190,11 +190,10 @@ app.all("*", (req, res) => {
 
         }).catch((e) => {
             //console.error(errorResponse("the error occured",e.code,401,e.message))
-            res.json(errorResponse(e.code, 401, e.message))
+            res.json(errorResponse(e.code, 401, e.message.toString()))
         })
 
     } else {
-        console.log(errorResponse("Unauthorized", 401, "no authorization token"))
         res.json(errorResponse("Unauthorized", 401, "no authorization token"))
     }
 })
