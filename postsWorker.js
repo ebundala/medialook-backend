@@ -40,7 +40,6 @@ open.then((conn) => {
         });
     });
 }).catch(console.error);
-  
 }
 catch(e){
     console.error(e);
