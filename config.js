@@ -4,7 +4,7 @@ module.exports={
 Hostname:hostname,
 dbHost:"db",
 amqpHost:"rabbit",
-timeOutSecs:30,
+timeOutSecs:5,
 RabbitMqSettings:{
     protocol: 'amqp',
     hostname: "rabbit",

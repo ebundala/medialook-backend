@@ -15,37 +15,38 @@ const amqplib = require('amqplib');
 
 
 const mediaQueueTask = (timeout = timeOutSecs) => {
-    try {
-        const open = amqplib.connect(RabbitMqSettings);
-        let timerHandle;
-        open.then(function (conn) {
-            return conn.createChannel();
-        }).then(function (ch) {
-            //send single media message per sec
-            timerHandle = setInterval(() => {
-                if (queue.length) {
-                    ch.assertQueue(MediaQueue).then((ok) => {
-                        console.time("queing media");
-                        ch.sendToQueue(MediaQueue, Buffer.from(JSON.stringify(queue.pop())));
-                        console.timeEnd("queing media");
-                    });
-                }
-            }, 250)
+    let timerHandle;
+    return new Promise((resolve, reject) => {
+        try {
+            const open = amqplib.connect(RabbitMqSettings);
+            resolve(open);
+        }
+        catch (e) {
+            reject(e);
+        }
+    }).then(function (conn) {
+        return conn.createChannel();
+    }).then(function (ch) {
+        //send single media message per sec
+        timerHandle = setInterval(() => {
+            if (queue.length) {
+                ch.assertQueue(MediaQueue).then((ok) => {
+                    console.time("queing media");
+                    ch.sendToQueue(MediaQueue, Buffer.from(JSON.stringify(queue.pop())));
+                    console.timeEnd("queing media");
+                });
+            }
+        }, 250)
 
-        }).catch((e) => {
-            clearInterval(timerHandle);
-            console.error(e)
-            throw e;
-        });
-    }
-    catch (e) {
+    }).catch((e) => {
+        clearInterval(timerHandle);
         console.error(e)
         console.log("retrying in ")
         setTimeout(() => {
             console.log("retrying ")
             mediaQueueTask(2 * timeout);
-        }, 50 * timeout)
-    }
+        }, timeout)
+    });
 
 }
 
