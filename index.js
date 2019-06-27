@@ -27,7 +27,7 @@ const mediaQueueTask = (timeout = timeOutSecs) => {
     }).then(function (conn) {
         return conn.createChannel();
     }).then(function (ch) {
-        //send single media message per sec
+        
         timerHandle = setInterval(() => {
             if (queue.length) {
                 ch.assertQueue(MediaQueue).then((ok) => {
@@ -121,14 +121,14 @@ app.get("/refreshfeeds", (req, res) => {
     if (!req.db) {
         res.json(errorResponse(400, 400, "failed to connect to database"))
     }
-    const sql = "select feedUrl,mediaName,@rid from OMedia ";
+    const sql = "select feedUrl,mediaName,@rid, updatedAt from OMedia ";
 
 
     req.db.query(sql).then((medias) => {
 
         return medias
     })
-        .then((medias) => {
+    .then((medias) => {
             //medias.map((item) => queue.push(item));
             queue = medias;
             res.json(successResponse(medias.length));
@@ -183,7 +183,7 @@ app.all("*", (req, res) => {
             } else {
                 apiProxy.web(req, res, {
                     target: `http://${dbHost}:2480`,
-                    auth: `${claims["email"]}:${claims["user_id"]}`,//Todo switch to current user credentials
+                    auth: `${claims["email"]}:${claims["user_id"]}`,
                     followRedirects: true,
                     xfwd: false
                 })
@@ -414,9 +414,9 @@ function createUserWithToken(req, res) {
 
 
 function buildFeedSql(item, i) {
-    return `let q${i} = insert into OMedia set mediaName='${item.mediaName}', url='${item.url}',
+    return `let q${i} = insert into OMedia set mediaName='${striptags(item.mediaName,"")}', url='${item.url}',
    createdAt=sysdate('yyyy-MM-dd HH:mm:ss'),
- featuredImage='${item.featuredImage}', feedUrl='${item.feedUrl}', feedName='${item.feedName}'`;
+ featuredImage='${item.featuredImage}', feedUrl='${item.feedUrl}', feedName='${striptags(item.feedName,"")}'`;
 }
 
 

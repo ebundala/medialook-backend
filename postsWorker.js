@@ -93,7 +93,7 @@ function findCategories(post, categories) {
 
 }
 function buildQuery(post, mediaId, categories) {
-    let category = findCategories(post, categories);
+   /* let category = findCategories(post, categories);
     if (category.length == 0) {
         post.categories.push("Breaking news");
         category = findCategories(post, categories);
@@ -107,7 +107,7 @@ function buildQuery(post, mediaId, categories) {
         return "let c" + 1 + "=create EDGE OBelong from $b to " + rid + ";";
     });
 
-    categorySql = categoryEdges.join("\n");
+    categorySql = categoryEdges.join("\n");*/
     let pubDate = "";
 
     if (post.pubDate) {
@@ -146,7 +146,7 @@ function buildQuery(post, mediaId, categories) {
         `pubDate="${pubDate}",` +
         "summary=:summary;\n" +
         `let c = create EDGE OPublish from ${mediaId} to $b;\n` +
-        categorySql +
+      //  categorySql +
         "commit retry 1;" +
         "return $b;";
 

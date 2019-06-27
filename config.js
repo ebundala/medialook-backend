@@ -5,6 +5,7 @@ Hostname:hostname,
 dbHost:"db",
 amqpHost:"rabbit",
 timeOutSecs:5,
+refreshCycle:(15 * 60 * 1000),
 RabbitMqSettings:{
     protocol: 'amqp',
     hostname: "rabbit",
@@ -13,8 +14,7 @@ RabbitMqSettings:{
     password: 'sosote16',
     vhost: '/',
     //authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL']
-}
-,
+},
 ServerConfig:{
     host: "db",
     port: 2424,

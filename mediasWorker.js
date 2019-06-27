@@ -1,14 +1,13 @@
 /**
  * Created by ebundala on 1/9/2019.
  */
-const { timeOutSecs, ServerConfig, RabbitMqSettings, MediaQueue, PostQueue } = require('./config')
-//const validator = require('validator');
+const { timeOutSecs, refreshCycle,ServerConfig, RabbitMqSettings, MediaQueue, PostQueue } = require('./config')
 const OrientDB = require('orientjs');
 const FeedParser = require("davefeedread");
 const striptags = require('striptags');
-//const amqp = require('amqplib/callback_api');
 const amqplib = require('amqplib');
 
+const Server=OrientDB(ServerConfig)
 
 let queue = [];
 
@@ -27,16 +26,17 @@ const mediaConsumerTask = (timeout = timeOutSecs) => {
     }
     ).then((conn) => {
         return conn.createChannel();
-    }).then(async (ch) => {
+    }).then((ch) => {
         return ch.assertQueue(MediaQueue).then((ok) => {
             return ch.consume(MediaQueue, (msg) => {
                 if (msg !== null) {
                     let str = msg.content.toString()
-                    console.log(str);
+                    console.debug(str);
                     let media = JSON.parse(str);
-                    console.log(media);
-                    return processFeed(media).then((q) => {
+                    console.debug(media);
+                    return processFeed(media).then( async (q) => {
                         queue.push.apply(queue, q);
+                        await updatedAt(media)
                         ch.ack(msg);
                     }).catch((_) => {
                         ch.ack(msg)
@@ -48,7 +48,7 @@ const mediaConsumerTask = (timeout = timeOutSecs) => {
     }).
         catch((e) => {
             console.error(e);
-            console.log("wait for next retry ")
+            console.debug("wait for next retry ")
             setTimeout(() => {
                 mediaConsumerTask((2 * timeout));
             }, timeout)
@@ -83,23 +83,43 @@ const postsProducerTask = (timeout = timeOutSecs) => {
     }).catch((e) => {
         clearInterval(timerHandle);
         console.error(e);
-        console.log("wait for next retry ")
+        console.debug("wait for next retry ")
         setTimeout(() => {
             postsProducerTask((2 * timeout));
         }, timeout)
     });
 }
 
+function updatedAt(feed){
+    const sql=`update OMedia set updatedAt=sysdate('yyyy-MM-dd HH:mm:ss') where @rid=${feed.rid.toString().replace("#", "")}`
+    const db = Server.use({
+        name: 'medialook',
+        username: 'medialook',
+        password: 'medialook'
+    });
+    return db.query(sql);
+}
 
 
 function processFeed(media) {
-    console.log("fetching feed ", media.feedUrl);
+    console.debug("fetching feed ", media.feedUrl);
     return fetchFeeds(media.feedUrl).then((feedContent) => {
-
-        return feedContent.items.map((post, i, _) => {
-            return { "mediaId": media.rid.toString().replace("#", ""), "post": post } //buildQuery(post, media, categories);
+        let posts= feedContent.items.map((post, i, _) => {
+            return {
+            "mediaId": media.rid.toString().replace("#", ""),
+             "post": post
+            }
+        }).filter(({post},i)=>{
+            if(post.pubdate&&media.updatedAt){
+            let pubDate= (new Date(post.pubDate)).getTime();
+            updatedAt= (new Date(media.updatedAt)).getTime()-refreshCycle;
+            //console.debug("........................dates ",pubDate,updatedAt," end ......................................")
+           return  pubDate>updatedAt;
+        }
+            return false
         })
-
+        console.debug(posts.length," posts found for ",media.mediaName)
+        return posts;
     });
 }
 
@@ -122,29 +142,3 @@ function fetchFeeds(feed) {
 
 mediaConsumerTask();
 postsProducerTask();
-
-
-
-
-
-/*
-amqp.connect(rabitmqSettings, function (err, conn) {
-    if (err) {
-        console.log(err)
-    } else {
-        conn.createChannel(function (err, ch) {
-            var q = 'medialook';
-
-            ch.assertQueue(q, { durable: true }, (err, ok) => {
-                if (err) {
-                    console.error(err);
-                } else {
-                    console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q);
-                    ch.consume(q, function (msg) {
-                        console.log(" [x] Received %s", msg.content.toString());
-                    }, { noAck: true });
-                }
-            });
-        });
-    }
-});*/
