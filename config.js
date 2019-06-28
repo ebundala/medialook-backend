@@ -5,7 +5,7 @@ Hostname:hostname,
 dbHost:"db",
 amqpHost:"rabbit",
 timeOutSecs:5,
-refreshCycle:(15 * 60 * 1000),
+refreshCycle:(30 * 60 * 1000),
 RabbitMqSettings:{
     protocol: 'amqp',
     hostname: "rabbit",

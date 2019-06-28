@@ -34,7 +34,6 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
             return ch.consume(PostQueue, (msg) => {
                 if (msg !== null) {
                     let str = msg.content.toString()
-                    console.log(str);
                     let msgObj = JSON.parse(str);
                     let query = buildQuery(msgObj.post, msgObj.mediaId, categories)
                     return savePostToDB(query, db).then((_) => {
@@ -48,7 +47,7 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
         });
     }).catch((e) => {
         console.error(e);
-        console.log("wait for next retry ")
+        console.debug("wait for next retry in ", timeout / 2, " s")
         setTimeout(() => {
             postsConsumerTask((2 * timeout));
         }, timeout)
@@ -61,8 +60,8 @@ function savePostToDB(query, db) {
         {
             class: 's',
             params: query.params
-        }).then((res) => {
-            console.log(res[0].title);
+        }).then(([res]) => {
+            console.debug("saved ", res.title);
         }).catch((e) => {
             console.error(e.message)
         })
@@ -85,7 +84,6 @@ function findCategories(post, categories) {
     return categories.filter((x) => {
         return post.categories.find((t, i, arr) => {
             let pattern = new RegExp(x.categoryName, "gi");
-            // console.log("testing",t);
             return t.toString().match(pattern);
         });
 
@@ -93,21 +91,21 @@ function findCategories(post, categories) {
 
 }
 function buildQuery(post, mediaId, categories) {
-   /* let category = findCategories(post, categories);
-    if (category.length == 0) {
-        post.categories.push("Breaking news");
-        category = findCategories(post, categories);
-    }
-
-    let categorySql;
-    let categoryEdges = category.map((t, i, arr) => {
-        // console.log("rid is ",t["@rid"]);
-        let recordId = t["@rid"];
-        let rid = recordId.cluster + ":" + recordId.position;
-        return "let c" + 1 + "=create EDGE OBelong from $b to " + rid + ";";
-    });
-
-    categorySql = categoryEdges.join("\n");*/
+    /* let category = findCategories(post, categories);
+     if (category.length == 0) {
+         post.categories.push("Breaking news");
+         category = findCategories(post, categories);
+     }
+ 
+     let categorySql;
+     let categoryEdges = category.map((t, i, arr) => {
+         // console.debug("rid is ",t["@rid"]);
+         let recordId = t["@rid"];
+         let rid = recordId.cluster + ":" + recordId.position;
+         return "let c" + 1 + "=create EDGE OBelong from $b to " + rid + ";";
+     });
+ 
+     categorySql = categoryEdges.join("\n");*/
     let pubDate = "";
 
     if (post.pubDate) {
@@ -121,7 +119,7 @@ function buildQuery(post, mediaId, categories) {
     console.warn("\n...............\ndate format " + pubDate + "\n........................\n")
 
 
-    console.log("categories found", category);
+
     let sql = "begin;\n" +
         "let a=select from OPost where ";
 
@@ -146,7 +144,7 @@ function buildQuery(post, mediaId, categories) {
         `pubDate="${pubDate}",` +
         "summary=:summary;\n" +
         `let c = create EDGE OPublish from ${mediaId} to $b;\n` +
-      //  categorySql +
+        //  categorySql +
         "commit retry 1;" +
         "return $b;";
 
