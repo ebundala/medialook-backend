@@ -39,7 +39,7 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
                     return savePostToDB(query, db).then((_) => {
                         ch.ack(msg);
                     }).catch((_) => {
-                        ch.ack(msg);
+                        ch.nack(msg);
                     })
 
                 }

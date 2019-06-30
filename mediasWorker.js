@@ -91,7 +91,7 @@ const mediaConsumerTask = (timeout = timeOutSecs) => {
                     })
                         .catch((e) => {
                             console.debug(e)
-                            ch.nack(msg, false, true)
+                            ch.nack(msg, false, false)
                         })
 
                 }
