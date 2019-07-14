@@ -8,10 +8,12 @@ const Express = require('express');
 const RssDiscover = require('rss-finder');
 const FeedParser = require("davefeedread");
 const validator = require('validator');
+const striptags = require("striptags");
 const OrientDB = require('orientjs');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccount/serviceAccount.json');
 const amqplib = require('amqplib');
+
 
 
 const mediaQueueTask = (timeout = timeOutSecs) => {
@@ -166,18 +168,17 @@ app.post("/signup", createUserWithToken)
 app.get("/feeds", getFeeds)
 
 app.all("*", (req, res) => {
+    if(!req.headers.authorization){
+        res.json(errorResponse("Unauthorized", 401, "no authorization token"))
+    }else{
     let authorization = req.headers.authorization
         .split(" ");
     delete req.headers.authorization;
     if (authorization.length == 2) {
         let token = authorization[1]
-        // console.log("bearer token \n",token)    
+            
         admin.auth().verifyIdToken(token).then((claims) => {
-            /*let claims={
-                "user_id":"admin",
-                "email":"admin",
-                "rid":"#5:0"
-            }*/
+           
             if (!claims.rid) {
                 throw Error("claims dont have rid")
             } else {
@@ -197,6 +198,7 @@ app.all("*", (req, res) => {
     } else {
         res.json(errorResponse("Unauthorized", 401, "no authorization token"))
     }
+  }
 })
 
 function addProtocal(url = "") {
@@ -218,17 +220,18 @@ function getFeeds(req, res) {
     let skip = (+req.query.skip);
     let limit = (+req.query.limit);
     console.log("reached", query, rid, skip, limit)
-    let sql = `select *,in_OFollow.out[@rid=:uid].size() as followed from OMedia where in_OFollow.out[@rid=:uid].size()<1 AND (
-     feedUrl.toLowerCase() like :query OR mediaName.toLowerCase() like ':query' OR feedName.toLowerCase() like :query OR url like :query)
+    //in_OFollow.out[@rid=:uid].size()<1
+    let sql = `select *,in_OFollow.out[@rid=:uid].size() as followed from OMedia where
+     feedUrl.toLowerCase() like "%${query}%" OR mediaName.toLowerCase() like "%${query}%" OR feedName.toLowerCase() like "%${query}%" OR url like "%${query}%"
      order by createdAt desc skip :skip limit :limit`;
-    req.db.query(sql, { params: { "query": '%' + query + '%', "uid": rid, "skip": skip, "limit": limit } })
+    req.db.query(sql, { params: { "query":  query , "uid": rid, "skip": skip, "limit": limit } })
         .then(async (result) => {
-            console.log(result);
+            console.log("..............results...........\n",result);
             if (result instanceof Array && result.length > 0) {
                 res.json(successResponse(result))
             } else {
                 let url = addProtocal(query);
-                console.log(url);
+                console.log("checking if url is feed =",url);
                 if (validator.isURL(url)) {
                     let feed;
                     feed = await parseFeed(url).catch((e) => {
@@ -251,6 +254,8 @@ function getFeeds(req, res) {
                         let result;
                         result = await publishMedia([media], req).catch((e) => {
                             console.log(e)
+                            //res.json(errorResponse(400, 400, e.message.toString()))
+                          return [];
                         })
                         res.json(successResponse(result));
                     }
@@ -259,7 +264,7 @@ function getFeeds(req, res) {
                         site = await RssDiscover(url).catch((e) => {
                             site = null;
                         });
-                        console.log(site);
+                        console.log("site info \n",site);
                         //todo handle website;
                         if (site && site.feedUrls && site.feedUrls.length) {
                             let medias = site.feedUrls.map((feed) => {
@@ -276,11 +281,13 @@ function getFeeds(req, res) {
                             let result;
                             result = await publishMedia(medias, req).catch((e) => {
                                 console.log(e)
+                               // res.json(errorResponse(400, 400, e.message.toString()))
+                               return [];
                             })
                             res.json(successResponse(result));
                         }
                         else {
-                            res.json(errorResponse(404, 404, "no feed was found"))
+                            res.json(errorResponse(404, 404, "Nothing was found"))
                         }
                     }
 
