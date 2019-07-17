@@ -9,6 +9,7 @@ const RssDiscover = require('rss-finder');
 const FeedParser = require("davefeedread");
 const validator = require('validator');
 const striptags = require("striptags");
+const {replaceHtml}=require("./utils")
 const OrientDB = require('orientjs');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccount/serviceAccount.json');
@@ -123,7 +124,7 @@ app.get("/refreshfeeds", (req, res) => {
     if (!req.db) {
         res.json(errorResponse(400, 400, "failed to connect to database"))
     }
-    const sql = "select feedUrl,mediaName,@rid as rid, updatedAt from OMedia ";
+    const sql = "select feedUrl,@rid, updatedAt,out_OPublish.size() as posts from OMedia ";
 
 
     req.db.query(sql).then((medias) => {
@@ -306,15 +307,19 @@ function publishMedia(mediaArr, req) {
             let sqlArr = mediaArr.map((item, i) => buildFeedSql(item, i).replace(new RegExp("\n", "g"), ""));
             let sql = `begin;
       ${sqlArr.join(";\n")};\n
-  let result = select from OMedia where feedUrl like '%${mediaArr.map((item) => item.feedUrl).join("%' OR feedUrl like '%")}%';
-      commit retry 5; 
-      RETURN $result`
+      let result = select *, out_OPublish.size() as posts from OMedia  where feedUrl like '%${mediaArr.map((item) => item.feedUrl).join("%' OR feedUrl like '%")}%';\n
+      commit retry 1;
+      RETURN $result;`
+   
 
             console.log(sql);
             let result;
-            result = await req.db.query(sql, { class: "s" }).catch((e) => {
+          result= await req.db.query(sql, { class: "s" })
+            .catch((e) => {
                 reject(e)
             })
+          console.log("new media added changed 5 \n",result);
+            queue.push.apply(queue,result)
             resolve(result);
 
         }
@@ -421,9 +426,9 @@ function createUserWithToken(req, res) {
 
 
 function buildFeedSql(item, i) {
-    return `let q${i} = insert into OMedia set mediaName='${striptags(item.mediaName, "")}', url='${item.url}',
+    return `let q${i} = insert into OMedia set mediaName='${replaceHtml(striptags(item.mediaName, ""))}', url='${item.url}',
    createdAt=sysdate('yyyy-MM-dd HH:mm:ss'),
- featuredImage='${item.featuredImage}', feedUrl='${item.feedUrl}', feedName='${striptags(item.feedName, "")}'`;
+ featuredImage='${item.featuredImage}', feedUrl='${item.feedUrl}', feedName='${replaceHtml(striptags(item.feedName, ""))}'`;
 }
 
 

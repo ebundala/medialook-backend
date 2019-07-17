@@ -6,6 +6,7 @@ const OrientDB = require('orientjs');
 const FeedParser = require("davefeedread");
 const striptags = require('striptags');
 const amqplib = require('amqplib');
+const {replaceHtml}=require("./utils")
 
 const Server = OrientDB(ServerConfig)
 
@@ -13,7 +14,7 @@ let queue = [];
 
 
 const updateFeed = async (feed, posts) => {
-    const sql = `update OMedia set updatedAt=sysdate('yyyy-MM-dd HH:mm:ss') where @rid = ${feed.rid}`
+    const sql = `update OMedia set updatedAt=sysdate('yyyy-MM-dd HH:mm:ss') where feedUrl = "${feed.feedUrl}"`
     let db = Server.use({
         name: 'medialook',
         username: 'medialook',
@@ -30,10 +31,16 @@ function processFeed(media) {
     return fetchFeeds(media.feedUrl).then((feedContent) => {
         let posts = feedContent.items.map((post, i, _) => {
             return {
-                "mediaId": media.rid.toString().replace("#", ""),
+                "feedUrl":media.feedUrl,
                 "post": post
             }
         }).filter((value, i) => {
+
+            if(!media.posts){
+                console.log("new media processing")
+                return true;
+            }
+            console.log("non new media processing")
             let { post } = value
             if (post.pubdate && media.updatedAt) {
                 let pubDate = (new Date(post.pubDate)).getTime();
@@ -81,8 +88,9 @@ const mediaConsumerTask = (timeout = timeOutSecs) => {
                 if (msg !== null) {
                     let str = msg.content.toString()
                     let media = JSON.parse(str);
-                    console.debug("Last feed updated at", media.updatedAt, media.rid);
+                    console.debug("Last feed updated at", media.updatedAt, media.rid,media.posts,media);
                     return processFeed(media).then((posts) => {
+
                         return updateFeed(media, posts)
                     }).then((posts) => {
                         console.debug("feed updated success");

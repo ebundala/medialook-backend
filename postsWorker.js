@@ -4,6 +4,7 @@
 const { timeOutSecs, ServerConfig, RabbitMqSettings, PostQueue } = require('./config');
 const OrientDB = require('orientjs');
 const striptags = require('striptags');
+const {replaceHtml}=require("./utils");
 
 const Server = OrientDB(ServerConfig);
 
@@ -29,13 +30,13 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
     }).then((conn) => {
         return conn.createChannel();
     }).then(async (ch) => {
-        const categories = await getCategories();
+        
         return ch.assertQueue(PostQueue).then((ok) => {
             return ch.consume(PostQueue, (msg) => {
                 if (msg !== null) {
                     let str = msg.content.toString()
                     let msgObj = JSON.parse(str);
-                    let query = buildQuery(msgObj.post, msgObj.mediaId, categories)
+                    let query = buildQuery(msgObj);
                     return savePostToDB(query, db).then((_) => {
                         ch.ack(msg);
                     }).catch((_) => {
@@ -80,32 +81,8 @@ function getCategories() {
 }
 
 
-function findCategories(post, categories) {
-    return categories.filter((x) => {
-        return post.categories.find((t, i, arr) => {
-            let pattern = new RegExp(x.categoryName, "gi");
-            return t.toString().match(pattern);
-        });
 
-    });
-
-}
-function buildQuery(post, mediaId, categories) {
-    /* let category = findCategories(post, categories);
-     if (category.length == 0) {
-         post.categories.push("Breaking news");
-         category = findCategories(post, categories);
-     }
- 
-     let categorySql;
-     let categoryEdges = category.map((t, i, arr) => {
-         // console.debug("rid is ",t["@rid"]);
-         let recordId = t["@rid"];
-         let rid = recordId.cluster + ":" + recordId.position;
-         return "let c" + 1 + "=create EDGE OBelong from $b to " + rid + ";";
-     });
- 
-     categorySql = categoryEdges.join("\n");*/
+function buildQuery({post,feedUrl}) {
     let pubDate = "";
 
     if (post.pubDate) {
@@ -129,6 +106,7 @@ function buildQuery(post, mediaId, categories) {
     else {
         sql = sql + "link=':link'";
     }
+    let media=`(select from OMedia where feedUrl='${feedUrl}')`;
     sql = sql + ";\n" +
         "if($a.size()>0){\n" +
         "ROLLBACK;\n" +
@@ -143,22 +121,22 @@ function buildQuery(post, mediaId, categories) {
         "link=:link," +
         `pubDate="${pubDate}",` +
         "summary=:summary;\n" +
-        `let c = create EDGE OPublish from ${mediaId} to $b;\n` +
+        `let c = create EDGE OPublish from ${media} to $b;\n` +
         //  categorySql +
         "commit retry 1;" +
         "return $b;";
 
     if (post.title) {
-        post.title = striptags(post.title)
+        post.title = replaceHtml( striptags(post.title));
     }
     if (post.summary) {
-        post.summary = striptags(post.summary);
+        post.summary = replaceHtml( striptags(post.summary));
     }
     if (post.image) {
         post.image = JSON.stringify(post.image);
     }
     if (post.description) {
-        post.description = striptags(post.description);
+        post.description = replaceHtml( striptags(post.description));
     }
     return { "sql": sql, params: post };
 }
