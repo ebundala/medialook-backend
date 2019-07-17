@@ -93,7 +93,7 @@ function buildQuery({post,feedUrl}) {
         pubDate = post.date.toString().replace("T", " ").toString();
 
     }
-    console.warn("\n...............\ndate format " + pubDate + "\n........................\n")
+    console.warn("\n...............\ndate format " + pubDate + "\n "+post.pubDate+"\n........................\n")
 
 
 
