@@ -30,7 +30,6 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
     }).then((conn) => {
         return conn.createChannel();
     }).then(async (ch) => {
-        
         return ch.assertQueue(PostQueue).then((ok) => {
             return ch.consume(PostQueue, (msg) => {
                 if (msg !== null) {
@@ -56,7 +55,6 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
 }
 
 function savePostToDB(query, db) {
-
     return db.query(query.sql,
         {
             class: 's',
@@ -125,6 +123,48 @@ function buildQuery({post,feedUrl}) {
         //  categorySql +
         "commit retry 1;" +
         "return $b;";
+        //console.debug(post.enclosures);
+   if((post.enclosures instanceof Array&&!post.enclosures.length)
+   ||!post.enclosures){
+
+      console.debug("post has no image\n "+post.guid+"\n retrying to get from content")
+       let content=post.summary+post.description;
+       let imageRegex=new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
+       let videoRegex=new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
+       let images=content.toString().match(imageRegex)
+       let videos=content.toString().match(videoRegex)
+       
+       
+       if(!post.enclosures){
+           post.enclosures=[];
+       }
+       if(images){
+         post.enclosures.push(...images.map((item)=>{
+               return{
+                "type":"image",
+                "url":item,
+              // "width":null,
+              // "height":null
+            };
+           }).filter((item)=>item.url&&item.type));
+       }  
+       if(videos){
+        post.enclosures.push(...videos.map((item)=>{
+              return{
+               "type":"video",
+              "url":item,
+             // "width":null,
+            //  "height":null
+           }
+          }).filter((item)=>item.url&&item.type));
+      }    
+      console.debug("images found ");
+      console.debug(post.enclosures); 
+     // if(!post.enclosures.length)
+     // post.enclosures=null;
+    }
+
+
 
     if (post.title) {
         post.title = replaceHtml( striptags(post.title));
@@ -135,6 +175,9 @@ function buildQuery({post,feedUrl}) {
     if (post.image) {
         post.image = JSON.stringify(post.image);
     }
+    /*if (post.enclosures) {
+        post.enclosures = JSON.stringify(post.enclosures);
+    }*/
     if (post.description) {
         post.description = replaceHtml( striptags(post.description));
     }
