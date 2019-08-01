@@ -4,7 +4,8 @@
 const { timeOutSecs, ServerConfig, RabbitMqSettings, PostQueue } = require('./config');
 const OrientDB = require('orientjs');
 const striptags = require('striptags');
-const {replaceHtml}=require("./utils");
+const { replaceHtml } = require("./utils");
+const probe = require('probe-image-size');
 
 const Server = OrientDB(ServerConfig);
 
@@ -35,12 +36,13 @@ const postsConsumerTask = (timeout = timeOutSecs) => {
                 if (msg !== null) {
                     let str = msg.content.toString()
                     let msgObj = JSON.parse(str);
-                    let query = buildQuery(msgObj);
-                    return savePostToDB(query, db).then((_) => {
-                        ch.ack(msg);
-                    }).catch((_) => {
-                        ch.nack(msg);
-                    })
+                    return buildQuery(msgObj).then((query) => {
+                        return savePostToDB(query, db).then((_) => {
+                            ch.ack(msg);
+                        }).catch((_) => {
+                            ch.nack(msg);
+                        })
+                    });
 
                 }
             });
@@ -68,19 +70,52 @@ function savePostToDB(query, db) {
 }
 
 
-function getCategories() {
-    const categoriesSql = "select from OCategory";
-    const db = Server.use({
-        name: 'medialook',
-        username: 'medialook',
-        password: 'medialook'
+const parseMediaGroup=(item) => {
+    let enclosures = []
+    let group = item["media:group"];
+    if(group&&group instanceof Array){
+      group.forEach(element => {
+        let content = element["media:content"];
+        if(content && content instanceof Array)
+        {
+            content.forEach(elem => {
+                let { medium, type, height, width, url } = elem["@"];
+                if (medium === "image" || type&&type.toString().match(/image/ig)) {
+                    if(height>200&&width>200)
+                    enclosures.push({
+                        height,
+                        width,
+                        type: type ? type : medium,
+                        url
+                    })
+                } else if (medium === "video" || type&&type.toString().match(/video/ig)) {
+                    enclosures.push({
+                        height,
+                        width,
+                        type: type ? type : medium,
+                        url
+                    })
+                }
+
+            })
+        }
     });
-    return db.query(categoriesSql);
+   }
+    return enclosures.sort((a,b)=>{
+        if(a.height>b.height){
+            return 1;
+        }
+        else if(a.height==b.height){
+          return 0
+        }
+        return -1;
+    });
 }
+const reflect = p => p.then(v => ({ v, status: true }),
+    e => ({ e, status: false }));
 
 
-
-function buildQuery({post,feedUrl}) {
+async function buildQuery({ post, feedUrl }) {
     let pubDate = "";
 
     if (post.pubDate) {
@@ -91,7 +126,7 @@ function buildQuery({post,feedUrl}) {
         pubDate = post.date.toString().replace("T", " ").toString();
 
     }
-    console.warn("\n...............\ndate format " + pubDate + "\n "+post.pubDate+"\n........................\n")
+    console.warn("\n...............\ndate format " + pubDate + "\n " + post.pubDate + "\n........................\n")
 
 
 
@@ -104,7 +139,7 @@ function buildQuery({post,feedUrl}) {
     else {
         sql = sql + "link=':link'";
     }
-    let media=`(select from OMedia where feedUrl='${feedUrl}')`;
+    let media = `(select from OMedia where feedUrl='${feedUrl}')`;
     sql = sql + ";\n" +
         "if($a.size()>0){\n" +
         "ROLLBACK;\n" +
@@ -123,54 +158,82 @@ function buildQuery({post,feedUrl}) {
         //  categorySql +
         "commit retry 1;" +
         "return $b;";
-        //console.debug(post.enclosures);
-   if((post.enclosures instanceof Array&&!post.enclosures.length)
-   ||!post.enclosures){
 
-      console.debug("post has no image\n "+post.guid+"\n retrying to get from content")
-       let content=post.summary+post.description;
-       let imageRegex=new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
-       let videoRegex=new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
-       let images=content.toString().match(imageRegex)
-       let videos=content.toString().match(videoRegex)
-       
-       
-       if(!post.enclosures){
-           post.enclosures=[];
+        if ((post.enclosures instanceof Array && !post.enclosures.filter(item=>item.url).length )
+        || (post.enclosures instanceof Array &&!post.enclosures.length) ||  !post.enclosures) {
+
+        console.debug("post has no image\n " + post.guid + "\n retrying to get from content")
+
+        post.enclosures=parseMediaGroup(post);
+         
+        if(!post.enclosures.length)
+        {
+
+
+        let content = post.summary + post.description;
+        let imageRegex = new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
+        let videoRegex = new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm)
+  
+        /*      
+        let imageMediaRegex=new RegExp(/(<media(.*)((medium=["'](image)["']){1}|(type=["'](image(.+))["']){1})(.*)>)/);
+        let imageMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
+         
+        let videoMediaRegex=new RegExp(/(<media(.*)((medium=["'](video)["']){1}|(type=["'](video(.+))["']){1})(.*)>)/);
+        let videoMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
+        */
+        
+        let images = content.toString().match(imageRegex)
+        let videos = content.toString().match(videoRegex)
+        if(post.image){
+            let {url}=post.image;
+            if(images instanceof Array&&url)
+            images.push(url);
+            else if (url)
+            images=[url];
+        }
+
+        if (!post.enclosures) {
+            post.enclosures = [];
+        }
+        if (images) {
+            let probedImages = await Promise.all(images.map(item => reflect(probe(item, { timeout: 30000 }))))
+            post.enclosures.push(...probedImages
+                .filter((item) => item.status)
+                .filter(({v})=>v.width>=200&&v.height>=200)
+                .map(({v}) => {
+                    return {
+                        "type": v.mime,
+                        "url": v.url,
+                        "width": v.width,
+                        "height": v.height,
+                        "length": v.length
+                    };
+                }));
+        }
+        if (videos) {
+            post.enclosures.push(...videos.map((item) => {
+                return {
+                    "type": "video",
+                    "url": item,
+                    // "width":null,
+                    //  "height":null
+                }
+            }).filter((item) => item.url && item.type));
+        }
        }
-       if(images){
-         post.enclosures.push(...images.map((item)=>{
-               return{
-                "type":"image",
-                "url":item,
-              // "width":null,
-              // "height":null
-            };
-           }).filter((item)=>item.url&&item.type));
-       }  
-       if(videos){
-        post.enclosures.push(...videos.map((item)=>{
-              return{
-               "type":"video",
-              "url":item,
-             // "width":null,
-            //  "height":null
-           }
-          }).filter((item)=>item.url&&item.type));
-      }    
-      console.debug("images found ");
-      console.debug(post.enclosures); 
-     // if(!post.enclosures.length)
-     // post.enclosures=null;
+
+        console.debug("images found ");
+        console.debug(post.enclosures);
+      
     }
 
 
 
     if (post.title) {
-        post.title = replaceHtml( striptags(post.title));
+        post.title = replaceHtml(striptags(post.title));
     }
     if (post.summary) {
-        post.summary = replaceHtml( striptags(post.summary));
+        post.summary = replaceHtml(striptags(post.summary));
     }
     if (post.image) {
         post.image = JSON.stringify(post.image);
@@ -179,11 +242,10 @@ function buildQuery({post,feedUrl}) {
         post.enclosures = JSON.stringify(post.enclosures);
     }*/
     if (post.description) {
-        post.description = replaceHtml( striptags(post.description));
+        post.description = replaceHtml(striptags(post.description));
     }
     return { "sql": sql, params: post };
 }
-
 
 
 
