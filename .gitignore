@@ -3,3 +3,4 @@ node_modules
 feed.json
 rssParse.js
 server_v1
+.env

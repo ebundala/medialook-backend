@@ -1,0 +1,100 @@
+version: '3.2'
+services:
+  app:
+    image: 'node:${NODE_TAG}'
+    working_dir: /usr/src/service
+    command: 'npm run serve'
+    depends_on:
+      - rabbit
+      - db
+    volumes:
+      - ./server_v2:/usr/src/service
+    
+    ports:
+     - 8080:3000
+    networks: 
+      - webnet
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 1g
+      restart_policy:
+        condition: on-failure
+  watcher:
+    image: 'node:${NODE_TAG}'
+    working_dir: /usr/src/service
+    command: 'npm run serve_watcher'
+    depends_on:
+      - rabbit
+      - db
+    volumes:
+      - ./server_v2:/usr/src/service
+    networks: 
+      - webnet
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: 256MiB
+      restart_policy:
+        condition: on-failure
+
+  rabbit:
+    image: 'rabbitmq:${RABBITMQ_TAG}'
+    environment:
+      RABBITMQ_ERLANG_COOKIE: '${RABBITMQ_ERLANG_COOKIE}'
+      RABBITMQ_NODENAME: '${RABBITMQ_NODENAME}'
+      RABBITMQ_DEFAULT_USER: '${RABBITMQ_DEFAULT_USER}'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_DEFAULT_PASS}'
+      #RABBITMQ_DEFAULT_VHOST: '${RABBITMQ_DEFAULT_VHOST}'
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: '${RABBITMQ_VM_MEMORY_HIGH_WATERMARK}' 
+    ports:
+      - 3000:15672 # management
+      - 3001:5672  # Amqp 
+      - 3002:1883  # ws
+      - 3003:8883  # tls ws
+      - 3004:15675 #mqtt ws
+    networks: 
+      - webnet
+    volumes:
+      - ${PWD}/server_v2/server/config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      # - rabbitMq:/var/lib/rabbitmq
+      #- ./storage/rabbitMq/mnesia:/var/lib/rabbitmq/mnesia
+      #- ./storage/rabbitMq/schema:/var/lib/rabbitmq/schema
+      #- ./storage/rabbitMq/config:/var/lib/rabbitmq/config
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 512MiB
+      restart_policy:
+        condition: any
+  db:
+    image: 'arangodb/arangodb:${ARANGODB_TAG}'
+    environment:
+      ARANGO_ROOT_PASSWORD: '${ARANGO_ROOT_PASSWORD}'
+      ARANGO_RANDOM_ROOT_PASSWORD: '${ARANGO_RANDOM_ROOT_PASSWORD}'
+      ARANGO_NO_AUTH: '${ARANGO_NO_AUTH}'
+      ARANGO_STORAGE_ENGINE: '${ARANGO_STORAGE_ENGINE}'   
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 1g
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 8529:8529
+    networks:
+      - webnet
+    volumes:
+      - ./server_v2/storage/arangodb/data:/var/lib/arangodb3
+      - ./server_v2/storage/arangodb/apps:/var/lib/arangodb3-apps
+  
+networks:
+  webnet:

@@ -1,0 +1,9 @@
+{
+    "eslint.alwaysShowStatus": true,
+    "eslint.autoFixOnSave": true,
+    "eslint.workingDirectories": [
+        "./server_v2"
+    ],
+    "npm.enableScriptExplorer": true,
+    "docker-compose.autoRefreshInterval": 15000
+}

@@ -1,0 +1,57 @@
+{
+  "name": "medialook_backend",
+  "version": "1.0.0",
+  "description": "server for medialook ",
+  "main": "index.js",
+  "scripts": {
+    "watch": "nodemon --watch server --exec npm run rebuild",
+    "rebuild": "babel server --out-dir dist --source-maps --copy-files",
+    "clean_rebuild": "npm run clean && npm run rebuild",
+    "serve": "nodemon dist/index.js",
+    "serve_watcher": "nodemon dist/changeNotifiers/index.js",
+    "test": "nyc --reporter=text --reporter=html mocha --recursive --require @babel/polyfill --require @babel/register",
+    "build": "npm run clean && npm run rebuild",
+    "clean": "rm -rf dist && mkdir dist",
+    "start": "npm run build && node dist/index.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "keywords": [
+    "graphql",
+    "arangodb",
+    "flutter",
+    "nodejs",
+    "docker"
+  ],
+  "author": "Elias Bundala",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^2.9.3",
+    "apollo-server-express": "^2.9.3",
+    "arangojs": "^6.11.1",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^8.5.0",
+    "graphql": "^14.5.6",
+    "request-easy": "^2.0.2",
+    "validator": "^11.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-transform-async-to-generator": "^7.5.0",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/register": "^7.5.5",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "coveralls": "^3.0.6",
+    "eslint": "^6.3.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "faker": "^4.1.0",
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.1",
+    "nyc": "^14.1.1"
+  }
+}
