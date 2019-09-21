@@ -1,9 +1,0 @@
-select country,$b from (
-  SELECT *,$b FROM OReport 
-  LET $a = (select geometry from OCountry where countryName="United Republic of Tanzania"),
-  $b= ST_AsText($a.geometry[0])
- /* where ST_Within(location,{"@class": "OPolygon","coordinates" : [12.4684635,41.8914114,16.4684635,46.8914114]})=true */ 
-  order by createdAt desc
-)
-
-order by createdAt desc

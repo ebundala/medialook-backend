@@ -1,5 +1,0 @@
-CREATE DATABASE remote:localhost/medialook root sosote16 plocal graph;
-IMPORT DATABASE ./schemas/medialook.export.gz; 
-CREATE DATABASE remote:localhost/bizapp root sosote16 plocal graph;
-IMPORT DATABASE ./schemas/bizapp.json.gz; 
-

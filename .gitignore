@@ -2,3 +2,4 @@ node_modules
 .idea
 feed.json
 rssParse.js
+server_v1
