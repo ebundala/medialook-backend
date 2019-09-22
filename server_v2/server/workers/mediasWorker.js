@@ -31,7 +31,7 @@ const updateFeed = async (feed, posts) => {
   const FeedsCol = DB.collection('Feeds');
   const { feedUrl } = feed;
   const mergeObjects = true;
-  const updatedAt = (new Date()).toUTCString();
+  const updatedAt = (new Date()).toISOString();
   const result = await FeedsCol
     .updateByExample({ feedUrl }, { updatedAt }, { mergeObjects }).catch((e) => e);
   if (result instanceof Error) {
@@ -42,27 +42,29 @@ const updateFeed = async (feed, posts) => {
 };
 
 
-const processFeed = (media) => {
-  debug('fetching feed ', media.feedUrl);
-  return fetchFeeds(media.feedUrl).then((feedContent) => {
+const processFeed = (feed) => {
+  debug('fetching feed ', feed.feedUrl);
+  return fetchFeeds(feed.feedUrl).then((feedContent) => {
     const posts = feedContent.items.map((post) => ({
-      feedUrl: media.feedUrl,
+      // feedUrl: feed.feedUrl,
+      feedId: feed._id,
+      mediaName: feed.mediaName,
       post,
     })).filter((value) => {
-      if (!media.posts) {
+      if (!feed.posts) {
         debug('new media processing');
         return true;
       }
       debug('non new media processing');
       const { post } = value;
-      if (post.pubdate && media.updatedAt) {
+      if (post.pubdate && feed.updatedAt) {
         const pubDate = (new Date(post.pubDate)).getTime();
-        const lastUpdate = (new Date(media.updatedAt)).getTime() - REFRESH_TIME_CYCLE;
+        const lastUpdate = (new Date(feed.updatedAt)).getTime() - REFRESH_TIME_CYCLE;
         return pubDate > lastUpdate;
       }
       return false;
     });
-    debug(posts.length, ' posts found for ', media.mediaName);
+    debug(posts.length, ' posts found for ', feed.mediaName);
     return posts;
   });
 };

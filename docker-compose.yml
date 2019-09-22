@@ -42,6 +42,7 @@ services:
           memory: 256MiB
       restart_policy:
         condition: on-failure
+  
   post_worker:
     image: 'node:${NODE_TAG}'
     working_dir: /usr/src/service

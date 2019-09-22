@@ -10,7 +10,7 @@ import probe from 'probe-image-size';
 import {
   debug, error,
 } from 'console';
-import { aql } from 'arangojs';
+// import { aql } from 'arangojs';
 import misc from '../config/misc';
 // eslint-disable-next-line no-unused-vars
 import DB from '../config/db';
@@ -23,17 +23,19 @@ const {
 } = misc;
 
 
-const savePostToDB = (query) => {
-  // eslint-disable-next-line no-unused-vars
-  const { sql, params } = query;
-  debug(params);
-  return params;
-  /* return DB.query(sql, params)
-    .then((res) => {
-      debug('saved ', res);
-    }).catch((e) => {
-      error(e.message);
-    }); */
+const savePostToDB = async (data) => {
+  const { feedId, mediaName, post } = data;
+  debug(post.author, mediaName, feedId);
+  const col = DB.collection('Posts');
+  const edgeCol = DB.edgeCollection('Publish');
+  return col.save(post)
+    .then((doc) => edgeCol
+      // eslint-disable-next-line no-underscore-dangle
+      .save({ _from: feedId, _to: doc._id }))
+    .then((err) => {
+      debug(err);
+      return err;
+    });
 };
 
 
@@ -83,13 +85,29 @@ const reflect = (p) => p.then((v) => ({ v, status: true }),
   (e) => ({ e, status: false }));
 
 
-const buildQuery = async ({ post }) => {
-  if ((post.enclosures instanceof Array && !post.enclosures.filter((item) => item.url).length)
-          || (post.enclosures instanceof Array && !post.enclosures.length) || !post.enclosures) {
+const buildPost = async ({ post, mediaName, feedId }) => {
+  let {
+    summary,
+    createdAt,
+    // eslint-disable-next-line prefer-const
+    image,
+    author,
+    // eslint-disable-next-line prefer-const
+    link,
+    // eslint-disable-next-line prefer-const
+    guid,
+    description,
+    title,
+    enclosures,
+    pubDate,
+    updatedAt,
+  } = post;
+  if ((enclosures instanceof Array && !enclosures.filter((item) => item.url).length)
+          || (enclosures instanceof Array && !enclosures.length) || !enclosures) {
     debug(`post has no image\n ${post.guid}\n retrying to get from content`);
-    post.enclosures = parseMediaGroup(post);
-    if (!post.enclosures.length) {
-      const content = post.summary + post.description;
+    enclosures = parseMediaGroup(post);
+    if (!enclosures.length) {
+      const content = summary + description;
       const imageRegex = new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
       const videoRegex = new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
 
@@ -104,18 +122,18 @@ const buildQuery = async ({ post }) => {
 
       let images = content.toString().match(imageRegex);
       const videos = content.toString().match(videoRegex);
-      if (post.image) {
-        const { url } = post.image;
+      if (image) {
+        const { url } = image;
         if (images instanceof Array && url) { images.push(url); } else if (url) { images = [url]; }
       }
 
-      if (!post.enclosures) {
-        post.enclosures = [];
+      if (!enclosures) {
+        enclosures = [];
       }
       if (images) {
         const probedImages = await Promise
           .all(images.map((item) => reflect(probe(item, { timeout: 30000 }))));
-        post.enclosures.push(...probedImages
+        enclosures.push(...probedImages
           .filter((item) => item.status)
           .filter(({ v }) => v.width >= 200 && v.height >= 200)
           .map(({ v }) => ({
@@ -127,7 +145,7 @@ const buildQuery = async ({ post }) => {
           })));
       }
       if (videos) {
-        post.enclosures.push(...videos.map((item) => ({
+        enclosures.push(...videos.map((item) => ({
           type: 'video',
           url: item,
           // "width":null,
@@ -136,29 +154,58 @@ const buildQuery = async ({ post }) => {
       }
     }
     debug('images found ');
-    debug(post.enclosures);
+    debug(enclosures);
   }
-  if (post.title) {
-    post.title = replaceHtml(striptags(post.title));
+  if (title) {
+    title = replaceHtml(striptags(title));
   }
-  if (post.summary) {
-    post.summary = replaceHtml(striptags(post.summary));
+  if (summary) {
+    summary = replaceHtml(striptags(summary));
   }
-  if (post.image) {
-    post.image = JSON.stringify(post.image);
-  }
+  // if (image) {
+  // image = image; // JSON.stringify(post.image);
+  // }
   /* if (post.enclosures) {
           post.enclosures = JSON.stringify(post.enclosures);
       } */
-  if (post.description) {
-    post.description = replaceHtml(striptags(post.description));
+  if (description) {
+    description = replaceHtml(striptags(description));
   }
-  const sql = aql`
-  let post = 
-  let publish = 
-  return post
-  `;
-  return { sql, params: post };
+  createdAt = (new Date()).toISOString();
+  const now = new Date();
+  try {
+    let pub = new Date(pubDate);
+    if (pub >= now) {
+      pub = now;
+    }
+    updatedAt = pub.toISOString();
+    pubDate = updatedAt;
+  } catch (e) {
+    updatedAt = now.toISOString();
+    pubDate = updatedAt;
+  }
+
+  if (!author) {
+    author = mediaName;
+  }
+  // return  { sql, params:  };
+  return {
+    feedId,
+    mediaName,
+    post: {
+      summary,
+      createdAt,
+      image,
+      author,
+      link,
+      guid,
+      description,
+      title,
+      enclosures,
+      pubDate,
+      updatedAt,
+    },
+  };
 };
 
 const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, reject) => {
@@ -174,7 +221,7 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
       if (msg !== null) {
         const str = msg.content.toString();
         const msgObj = JSON.parse(str);
-        buildQuery(msgObj).then((query) => savePostToDB(query)
+        buildPost(msgObj).then((data) => savePostToDB(data)
           .then(() => {
             ch.ack(msg);
           }).catch(() => {
