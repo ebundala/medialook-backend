@@ -4,7 +4,7 @@ import { log } from 'console';
 export default (watcher) => {
 // node.subscribe({ collection: 'users' });
 // node.start();
-  watcher.on('users', (doc, type) => {
+  watcher.on('Users', (doc, type) => {
   // do something awesome
   // doc:Buffer
   // type:'insert'|'update'|'delete'

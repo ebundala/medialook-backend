@@ -22,6 +22,45 @@ services:
           memory: 1g
       restart_policy:
         condition: on-failure
+  media_worker:
+    image: 'node:${NODE_TAG}'
+    working_dir: /usr/src/service
+    command: 'npm run media_worker'
+    depends_on:
+      - rabbit
+      - db
+    volumes:
+      - ./server_v2:/usr/src/service
+    
+    networks: 
+      - webnet
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256MiB
+      restart_policy:
+        condition: on-failure
+  post_worker:
+    image: 'node:${NODE_TAG}'
+    working_dir: /usr/src/service
+    command: 'npm run post_worker'
+    depends_on:
+      - rabbit
+      - db
+    volumes:
+      - ./server_v2:/usr/src/service
+    networks: 
+      - webnet
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: 256MiB
+      restart_policy:
+        condition: on-failure      
   watcher:
     image: 'node:${NODE_TAG}'
     working_dir: /usr/src/service
@@ -41,7 +80,25 @@ services:
           memory: 256MiB
       restart_policy:
         condition: on-failure
-
+  migration:
+    image: 'node:${NODE_TAG}'
+    working_dir: /usr/src/service
+    command: 'npm run migration'
+    depends_on:
+      - db
+    volumes:
+      - ./server_v2:/usr/src/service
+    
+    networks: 
+      - webnet
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.025"
+          memory: 64MiB
+      restart_policy:
+        condition: on-failure
   rabbit:
     image: 'rabbitmq:${RABBITMQ_TAG}'
     environment:
@@ -49,7 +106,7 @@ services:
       RABBITMQ_NODENAME: '${RABBITMQ_NODENAME}'
       RABBITMQ_DEFAULT_USER: '${RABBITMQ_DEFAULT_USER}'
       RABBITMQ_DEFAULT_PASS: '${RABBITMQ_DEFAULT_PASS}'
-      #RABBITMQ_DEFAULT_VHOST: '${RABBITMQ_DEFAULT_VHOST}'
+      RABBITMQ_DEFAULT_VHOST: '${RABBITMQ_DEFAULT_VHOST}'
       RABBITMQ_VM_MEMORY_HIGH_WATERMARK: '${RABBITMQ_VM_MEMORY_HIGH_WATERMARK}' 
     ports:
       - 3000:15672 # management

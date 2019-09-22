@@ -1,0 +1,371 @@
+{
+    "result": [
+        {
+            "@type": "d",
+            "@rid": "#25:48714",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "On arrival crews found and treated a 19-year-old man for 'serious' stab wounds before taking him to the Royal Stoke University Hospital for further treatment",
+            "createdAt": "2019-09-11 11:53:42",
+            "image": "{\"url\":\"https://i2-prod.coventrytelegraph.net/incoming/article16900362.ece/ALTERNATES/s98/3_Armed-policeJPG.jpg\"}",
+            "in_OPublish": [
+                "#49:48826"
+            ],
+            "author": "Matt Simpson, James Rodger",
+            "link": "https://www.birminghammail.co.uk/news/midlands-news/armed-police-swoop-busy-street-16900349",
+            "guid": "https://www.birminghammail.co.uk/news/midlands-news/armed-police-swoop-busy-street-16900349",
+            "description": "On arrival crews found and treated a 19-year-old man for 'serious' stab wounds before taking him to the Royal Stoke University Hospital for further treatment",
+            "title": "Armed police swoop on busy street after teen stabbed in Stoke-on-Trent",
+            "enclosures": [
+                {
+                    "length": "754605",
+                    "width": "615",
+                    "type": "image/jpeg",
+                    "url": "https://i2-prod.coventrytelegraph.net/incoming/article16900362.ece/ALTERNATES/s615/3_Armed-policeJPG.jpg",
+                    "height": "409"
+                }
+            ],
+            "pubDate": "2019-09-11 11:00:10",
+            "updatedAt": "2019-09-11 11:00:10",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48715",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "Police were initially called to the Nisa Shop, on Kitts Green Road, after disorder broke out inside the store, on Tuesday but later found a  man, in his 20s, with head injuries.",
+            "createdAt": "2019-09-11 11:53:43",
+            "image": "{\"url\":\"https://i2-prod.birminghammail.co.uk/incoming/article16900220.ece/ALTERNATES/s98/0_Lea-Village-stabbing.jpg\"}",
+            "in_OPublish": [
+                "#49:48827"
+            ],
+            "author": "birminghammail.co.uk",
+            "link": "https://www.birminghammail.co.uk/news/midlands-news/investigation-underway-after-man-glassed-16900265",
+            "guid": "https://www.birminghammail.co.uk/news/midlands-news/investigation-underway-after-man-glassed-16900265",
+            "description": "Police were initially called to the Nisa Shop, on Kitts Green Road, after disorder broke out inside the store, on Tuesday but later found a  man, in his 20s, with head injuries.",
+            "title": "Investigation underway after man glassed in the head following disorder at Nisa store in Kitts Green",
+            "enclosures": [
+                {
+                    "length": "754605",
+                    "width": "615",
+                    "type": "image/jpeg",
+                    "url": "https://i2-prod.birminghammail.co.uk/incoming/article16900220.ece/ALTERNATES/s615/0_Lea-Village-stabbing.jpg",
+                    "height": "409"
+                }
+            ],
+            "pubDate": "2019-09-11 11:17:41",
+            "updatedAt": "2019-09-11 11:17:41",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48716",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "A martial arts school is raising funds for new sparring equipment to enable its students to develop their skills.",
+            "createdAt": "2019-09-11 11:53:45",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48828"
+            ],
+            "author": null,
+            "link": "https://www.thescarboroughnews.co.uk/news/people/scarborough-karate-school-s-funding-campaign-to-buy-new-training-equipment-1-9854547",
+            "guid": "1.9854547",
+            "description": "A martial arts school is raising funds for new sparring equipment to enable its students to develop their skills.",
+            "title": "Scarborough karate school’s funding campaign to buy new training equipment",
+            "enclosures": [
+                {
+                    "length": "133203",
+                    "type": "image/jpeg",
+                    "url": "http://www.thescarboroughnews.co.uk/webimage/1.9854546.1562144908!/image/image.jpg"
+                }
+            ],
+            "pubDate": "2019-07-03 13:00:00",
+            "updatedAt": "2019-07-03 13:00:00",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48717",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "The Scarborough Netball League held their end-of-season presentation night at Roscoe's Bar last week.",
+            "createdAt": "2019-09-11 11:53:46",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48829"
+            ],
+            "author": null,
+            "link": "https://www.thescarboroughnews.co.uk/sport/more-sport/photo-focus-13-pictures-from-the-scarborough-netball-league-presentation-night-1-9857805",
+            "guid": "1.9857805",
+            "description": "The Scarborough Netball League held their end-of-season presentation night at Roscoe's Bar last week.",
+            "title": "PHOTO FOCUS: 13 pictures from the Scarborough Netball League presentation night",
+            "enclosures": [
+                {
+                    "length": "63461",
+                    "type": "image/jpeg",
+                    "url": "http://www.thescarboroughnews.co.uk/webimage/1.9857791.1562244927!/image/image.jpg"
+                }
+            ],
+            "pubDate": "2019-07-05 11:27:00",
+            "updatedAt": "2019-07-05 11:27:00",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48718",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "Wheatcroft School’s netballers are celebrating after sealing success at the North Yorkshire County Games last week.",
+            "createdAt": "2019-09-11 11:53:47",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48830"
+            ],
+            "author": null,
+            "link": "https://www.thescarboroughnews.co.uk/sport/more-sport/wheatcroft-s-netball-stars-secure-county-success-1-9884625",
+            "guid": "1.9884625",
+            "description": "Wheatcroft School’s netballers are celebrating after sealing success at the North Yorkshire County Games last week.",
+            "title": "Wheatcroft’s netball stars secure county success",
+            "enclosures": [
+                {
+                    "length": "312671",
+                    "type": "image/jpeg",
+                    "url": "http://www.thescarboroughnews.co.uk/webimage/1.9884624.1563441157!/image/image.jpg"
+                }
+            ],
+            "pubDate": "2019-07-18 09:12:35",
+            "updatedAt": "2019-07-18 09:12:35",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48719",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "Yorkshire Carnegie have appointed former England scrum-half Martyn Wood as their new director of rugby.",
+            "createdAt": "2019-09-11 11:53:48",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48831"
+            ],
+            "author": null,
+            "link": "https://www.thescarboroughnews.co.uk/sport/more-sport/former-harrogate-and-england-no9-martyn-wood-takes-over-at-yorkshire-carnegie-1-9896064",
+            "guid": "1.9896064",
+            "description": "Yorkshire Carnegie have appointed former England scrum-half Martyn Wood as their new director of rugby.",
+            "title": "Former Harrogate and England No9 Martyn Wood takes over at Yorkshire Carnegie",
+            "enclosures": [
+                {
+                    "length": "270377",
+                    "type": "image/jpeg",
+                    "url": "http://www.thescarboroughnews.co.uk/webimage/1.9896063.1563970633!/image/image.jpg"
+                }
+            ],
+            "pubDate": "2019-07-24 12:11:53",
+            "updatedAt": "2019-07-24 12:11:53",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48720",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "\n        \nReaction  \n        Mon 25 Mar, AT 09:46      \n        Barbra Streisand apologises for Michael Jackson abuse claims    \nSinger had suggested that abuse ‘didn’t kill’ Leaving Neverland accusers",
+            "createdAt": "2019-09-11 11:53:49",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48832"
+            ],
+            "author": "Rebecca Gillie",
+            "link": "https://www.theweek.co.uk/100390/michael-jackson-barbra-streisand-apologises-for-abuse-comments",
+            "guid": "100390 at https://www.theweek.co.uk",
+            "description": "\n        \nReaction  \n        Mon 25 Mar, AT 09:46      \n        Barbra Streisand apologises for Michael Jackson abuse claims    \nSinger had suggested that abuse ‘didn’t kill’ Leaving Neverland accusers",
+            "title": "Michael Jackson: Barbra Streisand apologises for abuse comments",
+            "enclosures": [
+                
+            ],
+            "pubDate": "2019-03-25 09:36:39",
+            "updatedAt": "2019-03-25 09:36:39",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48721",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "\n        \nOne-Minute Read  \n        Tue 2 Apr, AT 12:37      \n        David Blaine: magician accused of sexual assault    \nNew York police investigating allegations by two women",
+            "createdAt": "2019-09-11 11:53:50",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48833"
+            ],
+            "author": "Brittany",
+            "link": "https://www.theweek.co.uk/100546/david-blaine-magician-accused-of-sexual-assault",
+            "guid": "100546 at https://www.theweek.co.uk",
+            "description": "\n        \nOne-Minute Read  \n        Tue 2 Apr, AT 12:37      \n        David Blaine: magician accused of sexual assault    \nNew York police investigating allegations by two women",
+            "title": "David Blaine: magician accused of sexual assault",
+            "enclosures": [
+                
+            ],
+            "pubDate": "2019-04-02 10:19:08",
+            "updatedAt": "2019-04-02 10:19:08",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48722",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "\n        \nProfile  \n        Wed 17 Apr, AT 10:16      \n        Will Bernie Sanders become US President in 2020?    \nThe Vermont senator who shook up the 2016 race hopes to go further in 2020",
+            "createdAt": "2019-09-11 11:53:51",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48834"
+            ],
+            "author": "Jamie Timson",
+            "link": "https://www.theweek.co.uk/69301/can-bernie-sanders-become-us-president",
+            "guid": "69301 at https://www.theweek.co.uk",
+            "description": "\n        \nProfile  \n        Wed 17 Apr, AT 10:16      \n        Will Bernie Sanders become US President in 2020?    \nThe Vermont senator who shook up the 2016 race hopes to go further in 2020",
+            "title": "Will Bernie Sanders become US President in 2020?",
+            "enclosures": [
+                
+            ],
+            "pubDate": "2016-02-05 09:39:34",
+            "updatedAt": "2016-02-05 09:39:34",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        },
+        {
+            "@type": "d",
+            "@rid": "#25:48723",
+            "@version": 1,
+            "@class": "OPost",
+            "summary": "\n        \nReaction  \n        Wed 8 May, AT 16:09      \n        Auschwitz-themed miniskirts and nine other fashion disasters    \nOnline retailer comes under fire for selling third-party merchandise printed with image of concentration camp",
+            "createdAt": "2019-09-11 11:53:52",
+            "image": "{}",
+            "in_OPublish": [
+                "#49:48835"
+            ],
+            "author": "oliverd",
+            "link": "https://www.theweek.co.uk/56180/auschwitz-themed-miniskirts-and-nine-other-fashion-disasters",
+            "guid": "56180 at https://www.theweek.co.uk",
+            "description": "\n        \nReaction  \n        Wed 8 May, AT 16:09      \n        Auschwitz-themed miniskirts and nine other fashion disasters    \nOnline retailer comes under fire for selling third-party merchandise printed with image of concentration camp",
+            "title": "Auschwitz-themed miniskirts and nine other fashion disasters",
+            "enclosures": [
+                
+            ],
+            "pubDate": "2013-11-21 12:20:48",
+            "updatedAt": "2013-11-21 12:20:48",
+            "@fieldTypes": "createdAt=t,in_OPublish=g,pubDate=t,updatedAt=t"
+        }
+    ],
+    "executionPlan": {
+        "@type": "d",
+        "@version": 0,
+        "cost": 0,
+        "prettyPrint": "+ FETCH FROM CLASS OPost\n  + FETCH FROM CLUSTER 25 ASC\n  + FETCH FROM CLUSTER 26 ASC\n  + FETCH FROM CLUSTER 27 ASC\n  + FETCH FROM CLUSTER 28 ASC\n  + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)\n+ CALCULATE PROJECTIONS\n  *",
+        "type": "QueryExecutionPlan",
+        "steps": [
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": -1,
+                "subSteps": [
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 25 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 26 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 27 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 28 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": -1,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchTemporaryFromTxStep",
+                        "description": "+ FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                        "type": "FetchTemporaryFromTxStep",
+                        "targetNode": "FetchTemporaryFromTxStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchTemporaryFromTxStep",
+                        "@fieldTypes": "cost=l"
+                    }
+                ],
+                "name": "FetchFromClassExecutionStep",
+                "description": "+ FETCH FROM CLASS OPost\n   + FETCH FROM CLUSTER 25 ASC\n   + FETCH FROM CLUSTER 26 ASC\n   + FETCH FROM CLUSTER 27 ASC\n   + FETCH FROM CLUSTER 28 ASC\n   + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                "type": "FetchFromClassExecutionStep",
+                "targetNode": "FetchFromClassExecutionStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClassExecutionStep",
+                "@fieldTypes": "cost=l,subSteps=z"
+            },
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": 0,
+                "subSteps": [
+                    
+                ],
+                "name": "ProjectionCalculationStep",
+                "description": "+ CALCULATE PROJECTIONS\n  *",
+                "type": "ProjectionCalculationStep",
+                "targetNode": "ProjectionCalculationStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.ProjectionCalculationStep",
+                "@fieldTypes": "cost=l"
+            }
+        ],
+        "javaType": "com.orientechnologies.orient.core.sql.executor.OSelectExecutionPlan",
+        "@fieldTypes": "cost=l,steps=z"
+    },
+    "notification": "Query executed in 1.556 sec. Returned 10 record(s)"
+}

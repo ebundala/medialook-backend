@@ -1,0 +1,287 @@
+{
+    "result": [
+        {
+            "@type": "d",
+            "@rid": "#69:0",
+            "@version": 4,
+            "@class": "OTag",
+            "in_OTagged": [
+                "#77:36"
+            ],
+            "importance": 100,
+            "tagName": "Sale",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#69:1",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 96,
+            "tagName": "College",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#69:2",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 92,
+            "tagName": "Accident",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#69:3",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 89,
+            "tagName": "Weather & Nature",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#69:4",
+            "@version": 3,
+            "@class": "OTag",
+            "in_OTagged": [
+                
+            ],
+            "importance": 84,
+            "tagName": "Other",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#70:0",
+            "@version": 6,
+            "@class": "OTag",
+            "in_OTagged": [
+                "#77:42"
+            ],
+            "importance": 99,
+            "tagName": "Awesome",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#70:1",
+            "@version": 11,
+            "@class": "OTag",
+            "in_OTagged": [
+                
+            ],
+            "importance": 95,
+            "tagName": "Upset",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#70:2",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 91,
+            "tagName": "Government",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#70:3",
+            "@version": 2,
+            "@class": "OTag",
+            "in_OTagged": [
+                "#79:31"
+            ],
+            "importance": 88,
+            "tagName": "Tech",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#71:0",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 98,
+            "tagName": "Rent",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#71:1",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 94,
+            "tagName": "Sports",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#71:2",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 90,
+            "tagName": "Help",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#71:3",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 87,
+            "tagName": "Talents",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#72:0",
+            "@version": 2,
+            "@class": "OTag",
+            "in_OTagged": [
+                "#78:38"
+            ],
+            "importance": 97,
+            "tagName": "Gossip",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#72:1",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 93,
+            "tagName": "Fitness",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#72:2",
+            "@version": 1,
+            "@class": "OTag",
+            "importance": 90,
+            "tagName": "Food & Cooking",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#72:3",
+            "@version": 6,
+            "@class": "OTag",
+            "in_OTagged": [
+                "#77:44"
+            ],
+            "importance": 85,
+            "tagName": "Status",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        }
+    ],
+    "executionPlan": {
+        "@type": "d",
+        "@version": 0,
+        "cost": 0,
+        "prettyPrint": "+ FETCH FROM CLASS OTag\n  + FETCH FROM CLUSTER 69 ASC\n  + FETCH FROM CLUSTER 70 ASC\n  + FETCH FROM CLUSTER 71 ASC\n  + FETCH FROM CLUSTER 72 ASC\n  + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)\n+ CALCULATE PROJECTIONS\n  *",
+        "type": "QueryExecutionPlan",
+        "steps": [
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": -1,
+                "subSteps": [
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 69 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 70 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 71 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 72 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": -1,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchTemporaryFromTxStep",
+                        "description": "+ FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                        "type": "FetchTemporaryFromTxStep",
+                        "targetNode": "FetchTemporaryFromTxStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchTemporaryFromTxStep",
+                        "@fieldTypes": "cost=l"
+                    }
+                ],
+                "name": "FetchFromClassExecutionStep",
+                "description": "+ FETCH FROM CLASS OTag\n   + FETCH FROM CLUSTER 69 ASC\n   + FETCH FROM CLUSTER 70 ASC\n   + FETCH FROM CLUSTER 71 ASC\n   + FETCH FROM CLUSTER 72 ASC\n   + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                "type": "FetchFromClassExecutionStep",
+                "targetNode": "FetchFromClassExecutionStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClassExecutionStep",
+                "@fieldTypes": "cost=l,subSteps=z"
+            },
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": 0,
+                "subSteps": [
+                    
+                ],
+                "name": "ProjectionCalculationStep",
+                "description": "+ CALCULATE PROJECTIONS\n  *",
+                "type": "ProjectionCalculationStep",
+                "targetNode": "ProjectionCalculationStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.ProjectionCalculationStep",
+                "@fieldTypes": "cost=l"
+            }
+        ],
+        "javaType": "com.orientechnologies.orient.core.sql.executor.OSelectExecutionPlan",
+        "@fieldTypes": "cost=l,steps=z"
+    },
+    "notification": "Query executed in 0.406 sec. Returned 17 record(s)"
+}

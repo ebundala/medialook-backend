@@ -50,7 +50,7 @@ export const linkIDProvider = async (req, res) => {
               email, displayName, photoURL, phoneNumber, disabled, emailVerified,
             } = user;
 
-            const users = DB.collection('users');
+            const users = DB.collection('Users');
             const exist = await users.firstExample({ email }).catch(() => false);
             const exist2 = await users.firstExample({ username }).catch(() => false);
             if (exist) {
@@ -104,7 +104,7 @@ export const signUpHandler = async (req, res) => {
   } else if (!isAlphanumeric(username)) {
     res.status(400).json(new ApiError(true, 400, 'Username can not contain special characters'));
   } else {
-    const users = DB.collection('users');
+    const users = DB.collection('Users');
     const exist = await users.firstExample({ email }).catch(() => false);
     const exist2 = await users.firstExample({ username }).catch(() => false);
     if (exist) {

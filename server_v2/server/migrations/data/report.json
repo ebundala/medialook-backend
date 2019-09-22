@@ -1,0 +1,464 @@
+{
+    "result": [
+        {
+            "@type": "d",
+            "@rid": "#73:30",
+            "@version": 3,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2Fcc4557a0-c266-11e9-d1e5-37f310d3782e.jpg?alt=media&token=6607016c-6125-44ea-9bbd-f8b1596861d1",
+                    "height": null
+                }
+            ],
+            "in_OLike": [
+                "#44:45"
+            ],
+            "in_OReported": [
+                "#97:30"
+            ],
+            "createdAt": "2019-08-19 09:50:42",
+            "district": "",
+            "text": "TR he was going to call you tomorrow morning to see if we",
+            "out_OTagged": [
+                
+            ],
+            "region": "Pwani Region",
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OLike=g,in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#73:31",
+            "@version": 1,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2F67536350-c293-11e9-814b-ed7eb24399b3.jpg?alt=media&token=8f712e05-1956-4dc2-997a-4d5e769bad5b",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#97:31"
+            ],
+            "createdAt": "2019-08-19 15:10:01",
+            "district": "",
+            "text": "sorry for your help and support on the way home from feed the cats 🙏😢🙏🙏😢 I I will get you a check for I will be yoy the morning and then I will get back without",
+            "region": "Pwani Region",
+            "out_OTagged": [
+                "#77:36"
+            ],
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#73:37",
+            "@version": 1,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "Unnamed Road",
+            "subLocality": "Kitunda Kiyombo",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.8916819",
+            "postalCode": "",
+            "locality": "Dar es Salaam",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTLSgKwVBZDf2FIxFYcZb4wUKUds1%2Fphotos%2Fbbb4a170-ce55-11e9-b94f-5d832392d1a1.jpg?alt=media&token=297b7c43-e5d0-4a2a-8dc3-f0412714ba1e",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#97:37"
+            ],
+            "createdAt": "2019-09-03 14:18:51",
+            "district": "Temeke",
+            "text": "somewhere",
+            "region": "Dar es Salam",
+            "out_OTagged": [
+                "#77:42"
+            ],
+            "longitude": "39.230571",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#73:39",
+            "@version": 1,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "Mbagala Rangi 3 Bus Stop",
+            "subLocality": "Mbagala",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.9186417",
+            "postalCode": "",
+            "locality": "Dar es Salaam",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTLSgKwVBZDf2FIxFYcZb4wUKUds1%2Fphotos%2Fbbab6630-d546-11e9-c9ad-3917aa7bf217.jpg?alt=media&token=e7e339cf-1ff5-4cba-a85d-b88fc6597d07",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#97:39"
+            ],
+            "createdAt": "2019-09-12 10:19:08",
+            "district": "Temeke",
+            "text": "Mishe mishe",
+            "region": "Dar es Salaam",
+            "out_OTagged": [
+                "#77:44"
+            ],
+            "longitude": "39.2707609",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#74:26",
+            "@version": 12,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "Unnamed Road",
+            "subLocality": "Kitunda Kiyombo",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.8973427",
+            "postalCode": "",
+            "locality": "Dar es Salaam",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTLSgKwVBZDf2FIxFYcZb4wUKUds1%2Fphotos%2F5e8c1470-bae0-11e9-f76e-cf5128e63a07.jpg?alt=media&token=171c75a3-d5cb-411a-8d28-84db6c471543",
+                    "height": null
+                }
+            ],
+            "in_OLike": [
+                "#44:44",
+                "#42:51"
+            ],
+            "in_OReported": [
+                "#98:26"
+            ],
+            "createdAt": "2019-08-09 20:01:06",
+            "district": "Temeke",
+            "text": "watching...wasafi Tv..Dnl",
+            "out_OTagged": [
+                
+            ],
+            "region": "Dar es Salam",
+            "longitude": "39.2302287",
+            "@fieldTypes": "in_OLike=g,in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#74:28",
+            "@version": 2,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "video",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fvideos%2F1b6d65e0-c274-11e9-e5d4-7d3e473588bc.mp4?alt=media&token=aaf5b074-1c5d-4f3c-a694-ed03d8dd958c",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#98:28"
+            ],
+            "createdAt": "2019-08-19 11:28:14",
+            "district": "",
+            "text": "video controls",
+            "out_OTagged": [
+                
+            ],
+            "region": "Pwani Region",
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#74:34",
+            "@version": 3,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "Bagamoyo",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.24583",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2F7d9faf90-d730-11e9-be0c-b3921077856e.jpg?alt=media&token=fc5a6596-eeb0-49cf-b838-193e18424ec2",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#98:34"
+            ],
+            "in_OCommentOf": [
+                "#90:33",
+                "#91:29"
+            ],
+            "createdAt": "2019-09-14 20:44:58",
+            "district": "Bagamoyo",
+            "text": "nakula safari",
+            "region": "Pwani Region",
+            "out_OTagged": [
+                "#78:38"
+            ],
+            "longitude": "38.484992299999995",
+            "@fieldTypes": "in_OReported=g,in_OCommentOf=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#75:24",
+            "@version": 2,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2F59847850-c265-11e9-9106-73fd83a04881.jpg?alt=media&token=d7c4272a-eec0-43a9-b658-e92934a5d885",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#99:24"
+            ],
+            "createdAt": "2019-08-19 09:41:42",
+            "district": "",
+            "text": "hello working",
+            "out_OTagged": [
+                
+            ],
+            "region": "Pwani Region",
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#75:25",
+            "@version": 2,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2F2b692980-c282-11e9-f7d1-cf31c2638968.jpg?alt=media&token=3bf37caa-cd5b-4c0c-91b5-b5e7e065489d",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#99:25"
+            ],
+            "createdAt": "2019-08-19 13:06:41",
+            "district": "",
+            "text": "just wanted the same as last time I was there is a chance that we could get together and have broken few minutes late I will be there for the meeting on Thursda",
+            "out_OTagged": [
+                
+            ],
+            "region": "Pwani Region",
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#75:27",
+            "@version": 1,
+            "@class": "OReport",
+            "country": "Tanzania",
+            "altitude": "0.0",
+            "locationName": "A7",
+            "subLocality": "",
+            "isoCountryCode": "TZ",
+            "latitude": "-6.749831299999999",
+            "postalCode": "",
+            "locality": "",
+            "enclosures": [
+                {
+                    "width": null,
+                    "type": "image",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/medialook.appspot.com/o/reports%2FTzsmunjVSDVHduzFK7GdSbrr9Du2%2Fphotos%2F4cd349f0-c5c7-11e9-814b-a7b2ceb9abe1.jpg?alt=media&token=26ae7a23-077b-4f52-a54a-d62416628f21",
+                    "height": null
+                }
+            ],
+            "in_OReported": [
+                "#99:27"
+            ],
+            "createdAt": "2019-08-23 16:59:16",
+            "district": "",
+            "text": "googling ",
+            "region": "Pwani Region",
+            "out_OTagged": [
+                "#79:31"
+            ],
+            "longitude": "38.9090258",
+            "@fieldTypes": "in_OReported=g,out_OTagged=g"
+        }
+    ],
+    "executionPlan": {
+        "@type": "d",
+        "@version": 0,
+        "cost": 0,
+        "prettyPrint": "+ FETCH FROM CLASS OReport\n  + FETCH FROM CLUSTER 73 ASC\n  + FETCH FROM CLUSTER 74 ASC\n  + FETCH FROM CLUSTER 75 ASC\n  + FETCH FROM CLUSTER 76 ASC\n  + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)\n+ CALCULATE PROJECTIONS\n  *",
+        "type": "QueryExecutionPlan",
+        "steps": [
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": -1,
+                "subSteps": [
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 73 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 74 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 75 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 76 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": -1,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchTemporaryFromTxStep",
+                        "description": "+ FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                        "type": "FetchTemporaryFromTxStep",
+                        "targetNode": "FetchTemporaryFromTxStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchTemporaryFromTxStep",
+                        "@fieldTypes": "cost=l"
+                    }
+                ],
+                "name": "FetchFromClassExecutionStep",
+                "description": "+ FETCH FROM CLASS OReport\n   + FETCH FROM CLUSTER 73 ASC\n   + FETCH FROM CLUSTER 74 ASC\n   + FETCH FROM CLUSTER 75 ASC\n   + FETCH FROM CLUSTER 76 ASC\n   + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                "type": "FetchFromClassExecutionStep",
+                "targetNode": "FetchFromClassExecutionStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClassExecutionStep",
+                "@fieldTypes": "cost=l,subSteps=z"
+            },
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": 0,
+                "subSteps": [
+                    
+                ],
+                "name": "ProjectionCalculationStep",
+                "description": "+ CALCULATE PROJECTIONS\n  *",
+                "type": "ProjectionCalculationStep",
+                "targetNode": "ProjectionCalculationStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.ProjectionCalculationStep",
+                "@fieldTypes": "cost=l"
+            }
+        ],
+        "javaType": "com.orientechnologies.orient.core.sql.executor.OSelectExecutionPlan",
+        "@fieldTypes": "cost=l,steps=z"
+    },
+    "notification": "Query executed in 0.314 sec. Returned 10 record(s)"
+}

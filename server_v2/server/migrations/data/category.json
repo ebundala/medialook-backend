@@ -1,0 +1,242 @@
+{
+    "result": [
+        {
+            "@type": "d",
+            "@rid": "#33:8",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 99,
+            "categoryName": "Entertainment",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#33:9",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 95,
+            "categoryName": "Technology",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#33:10",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 91,
+            "categoryName": "How To",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#33:11",
+            "@version": 11,
+            "@class": "OCategory",
+            "in_OTagged": [
+                
+            ],
+            "importance": 87,
+            "categoryName": "Other",
+            "@fieldTypes": "in_OTagged=g,importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#34:8",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 98,
+            "categoryName": "Sports",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#34:9",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 94,
+            "categoryName": "Music",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#34:10",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 90,
+            "categoryName": "Cooking",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#35:8",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 97,
+            "categoryName": "Politics",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#35:9",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 93,
+            "categoryName": "Education",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#35:10",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 89,
+            "categoryName": "Fashion & Beauty",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#36:7",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 100,
+            "categoryName": "General News",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#36:8",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 96,
+            "categoryName": "Business",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#36:9",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 92,
+            "categoryName": "Comedy",
+            "@fieldTypes": "importance=c"
+        },
+        {
+            "@type": "d",
+            "@rid": "#36:10",
+            "@version": 1,
+            "@class": "OCategory",
+            "importance": 88,
+            "categoryName": "Review",
+            "@fieldTypes": "importance=c"
+        }
+    ],
+    "executionPlan": {
+        "@type": "d",
+        "@version": 0,
+        "cost": 0,
+        "prettyPrint": "+ FETCH FROM CLASS OCategory\n  + FETCH FROM CLUSTER 33 ASC\n  + FETCH FROM CLUSTER 34 ASC\n  + FETCH FROM CLUSTER 35 ASC\n  + FETCH FROM CLUSTER 36 ASC\n  + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)\n+ CALCULATE PROJECTIONS\n  *",
+        "type": "QueryExecutionPlan",
+        "steps": [
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": -1,
+                "subSteps": [
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 33 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 34 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 35 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 36 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": -1,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchTemporaryFromTxStep",
+                        "description": "+ FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                        "type": "FetchTemporaryFromTxStep",
+                        "targetNode": "FetchTemporaryFromTxStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchTemporaryFromTxStep",
+                        "@fieldTypes": "cost=l"
+                    }
+                ],
+                "name": "FetchFromClassExecutionStep",
+                "description": "+ FETCH FROM CLASS OCategory\n   + FETCH FROM CLUSTER 33 ASC\n   + FETCH FROM CLUSTER 34 ASC\n   + FETCH FROM CLUSTER 35 ASC\n   + FETCH FROM CLUSTER 36 ASC\n   + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                "type": "FetchFromClassExecutionStep",
+                "targetNode": "FetchFromClassExecutionStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClassExecutionStep",
+                "@fieldTypes": "cost=l,subSteps=z"
+            },
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": 0,
+                "subSteps": [
+                    
+                ],
+                "name": "ProjectionCalculationStep",
+                "description": "+ CALCULATE PROJECTIONS\n  *",
+                "type": "ProjectionCalculationStep",
+                "targetNode": "ProjectionCalculationStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.ProjectionCalculationStep",
+                "@fieldTypes": "cost=l"
+            }
+        ],
+        "javaType": "com.orientechnologies.orient.core.sql.executor.OSelectExecutionPlan",
+        "@fieldTypes": "cost=l,steps=z"
+    },
+    "notification": "Query executed in 0.315 sec. Returned 14 record(s)"
+}

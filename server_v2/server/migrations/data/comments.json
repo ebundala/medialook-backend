@@ -1,0 +1,233 @@
+{
+    "result": [
+        {
+            "@type": "d",
+            "@rid": "#93:36",
+            "@version": 2,
+            "@class": "OComment",
+            "out_OCommentOf": [
+                
+            ],
+            "createdAt": "2019-08-08 04:14:17",
+            "in_OCommented": [
+                "#81:36"
+            ],
+            "text": "Sure. . blv your ideas..and ur struggle..",
+            "@fieldTypes": "out_OCommentOf=g,createdAt=t,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#93:37",
+            "@version": 2,
+            "@class": "OComment",
+            "out_OCommentOf": [
+                
+            ],
+            "createdAt": "2019-08-24 06:43:45",
+            "in_OCommented": [
+                "#81:37"
+            ],
+            "text": "bei gani boss",
+            "@fieldTypes": "out_OCommentOf=g,createdAt=t,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#93:38",
+            "@version": 1,
+            "@class": "OComment",
+            "createdAt": "2019-09-14 20:38:52",
+            "out_OCommentOf": [
+                "#89:38"
+            ],
+            "in_OCommented": [
+                "#81:38"
+            ],
+            "text": "good news",
+            "@fieldTypes": "createdAt=t,out_OCommentOf=g,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#94:31",
+            "@version": 2,
+            "@class": "OComment",
+            "out_OCommentOf": [
+                
+            ],
+            "createdAt": "2019-08-19 10:10:59",
+            "in_OCommented": [
+                "#82:31"
+            ],
+            "text": "not coming in today",
+            "@fieldTypes": "out_OCommentOf=g,createdAt=t,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#94:32",
+            "@version": 2,
+            "@class": "OComment",
+            "out_OCommentOf": [
+                
+            ],
+            "createdAt": "2019-09-01 18:42:22",
+            "in_OCommented": [
+                "#82:32"
+            ],
+            "text": "umeachwa mzee",
+            "@fieldTypes": "out_OCommentOf=g,createdAt=t,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#94:33",
+            "@version": 1,
+            "@class": "OComment",
+            "createdAt": "2019-09-15 17:27:01",
+            "out_OCommentOf": [
+                "#90:33"
+            ],
+            "in_OCommented": [
+                "#82:33"
+            ],
+            "text": "daah noma sana",
+            "@fieldTypes": "createdAt=t,out_OCommentOf=g,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#95:29",
+            "@version": 1,
+            "@class": "OComment",
+            "createdAt": "2019-09-16 04:18:00",
+            "out_OCommentOf": [
+                "#91:29"
+            ],
+            "in_OCommented": [
+                "#83:29"
+            ],
+            "text": "iyo ilikua demo naonyesha mtu",
+            "@fieldTypes": "createdAt=t,out_OCommentOf=g,in_OCommented=g"
+        },
+        {
+            "@type": "d",
+            "@rid": "#96:28",
+            "@version": 2,
+            "@class": "OComment",
+            "out_OCommentOf": [
+                
+            ],
+            "createdAt": "2019-08-08 04:12:50",
+            "in_OCommented": [
+                "#84:28"
+            ],
+            "text": "  ...Daniel you will do it oneday.. *mawazo yangu, maisha yangu",
+            "@fieldTypes": "out_OCommentOf=g,createdAt=t,in_OCommented=g"
+        }
+    ],
+    "executionPlan": {
+        "@type": "d",
+        "@version": 0,
+        "cost": 0,
+        "prettyPrint": "+ FETCH FROM CLASS OComment\n  + FETCH FROM CLUSTER 93 ASC\n  + FETCH FROM CLUSTER 94 ASC\n  + FETCH FROM CLUSTER 95 ASC\n  + FETCH FROM CLUSTER 96 ASC\n  + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)\n+ CALCULATE PROJECTIONS\n  *",
+        "type": "QueryExecutionPlan",
+        "steps": [
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": -1,
+                "subSteps": [
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 93 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 94 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 95 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": 0,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchFromClusterExecutionStep",
+                        "description": "+ FETCH FROM CLUSTER 96 ASC",
+                        "type": "FetchFromClusterExecutionStep",
+                        "targetNode": "FetchFromClusterExecutionStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClusterExecutionStep",
+                        "@fieldTypes": "cost=l"
+                    },
+                    {
+                        "@type": "d",
+                        "@version": 0,
+                        "cost": -1,
+                        "subSteps": [
+                            
+                        ],
+                        "name": "FetchTemporaryFromTxStep",
+                        "description": "+ FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                        "type": "FetchTemporaryFromTxStep",
+                        "targetNode": "FetchTemporaryFromTxStep",
+                        "javaType": "com.orientechnologies.orient.core.sql.executor.FetchTemporaryFromTxStep",
+                        "@fieldTypes": "cost=l"
+                    }
+                ],
+                "name": "FetchFromClassExecutionStep",
+                "description": "+ FETCH FROM CLASS OComment\n   + FETCH FROM CLUSTER 93 ASC\n   + FETCH FROM CLUSTER 94 ASC\n   + FETCH FROM CLUSTER 95 ASC\n   + FETCH FROM CLUSTER 96 ASC\n   + FETCH NEW RECORDS FROM CURRENT TRANSACTION SCOPE (if any)",
+                "type": "FetchFromClassExecutionStep",
+                "targetNode": "FetchFromClassExecutionStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.FetchFromClassExecutionStep",
+                "@fieldTypes": "cost=l,subSteps=z"
+            },
+            {
+                "@type": "d",
+                "@version": 0,
+                "cost": 0,
+                "subSteps": [
+                    
+                ],
+                "name": "ProjectionCalculationStep",
+                "description": "+ CALCULATE PROJECTIONS\n  *",
+                "type": "ProjectionCalculationStep",
+                "targetNode": "ProjectionCalculationStep",
+                "javaType": "com.orientechnologies.orient.core.sql.executor.ProjectionCalculationStep",
+                "@fieldTypes": "cost=l"
+            }
+        ],
+        "javaType": "com.orientechnologies.orient.core.sql.executor.OSelectExecutionPlan",
+        "@fieldTypes": "cost=l,steps=z"
+    },
+    "notification": "Query executed in 1.027 sec. Returned 8 record(s)"
+}
