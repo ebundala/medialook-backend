@@ -39,7 +39,7 @@ input ProfileUpdateInput{
     cover: String
     phoneNumber: String!
 }
-input FollowInput{
+input ActionInput{
       to: String!
 }
 type ProfilePayload{
@@ -55,8 +55,11 @@ type LogoutPayload{
     message: String!
     status: Boolean!
 }
-
-
+# union Content = User | 
+type ActionPayload {
+    message: String
+    node: User #Todo use a union for other types in future
+}
 type Mutation {
     signup(input: SignUpInput!): User
     signin(input: SignInInput!): AuthPayload!
@@ -64,6 +67,7 @@ type Mutation {
     destroySession(sessionToken: String!): LogoutPayload!
     linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
+    follow(input: ActionInput!): ActionPayload!
        
 }
 input UserQueryInput{
