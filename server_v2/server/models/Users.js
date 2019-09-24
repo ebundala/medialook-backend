@@ -125,7 +125,7 @@ export default class Users extends ArangoDataSource {
       .then(() => true).catch(() => false);
   }
 
-  createSessionToken(idToken, expiresIn = 60 * 60 * 5 * 1000) {
+  createSessionToken(idToken, expiresIn = 60 * 60 * 5 * 24 * 1000) {
     return admin.auth()
       .verifyIdToken(idToken, true)
       .then((decodedIdToken) => {
@@ -137,7 +137,7 @@ export default class Users extends ArangoDataSource {
             .then((sessionToken) => {
               return this.collection.document(decodedIdToken.uid)
               // eslint-disable-next-line arrow-body-style
-                .then((user) => { return { user, sessionToken }; });
+                .then((user) => { return { user, sessionToken, message: 'Session created successfully' }; });
             });
         }
         throw Error('A user that was not recently signed in is trying to set a session');
@@ -148,7 +148,8 @@ export default class Users extends ArangoDataSource {
     return admin.auth()
       .verifySessionCookie(sessionToken)
       .then((decodedClaims) => admin.auth()
-        .revokeRefreshTokens(decodedClaims.sub)).then(() => true);
+        .revokeRefreshTokens(decodedClaims.sub))
+      .then(() => ({ status: true, message: 'Session destroyed successfully' }));
   }
 
 
@@ -215,7 +216,7 @@ export default class Users extends ArangoDataSource {
                     if (data instanceof Error) {
                       throw new Error('Failed to get user info with session');
                     } else {
-                      return data;
+                      return { user: data, message: 'Account linked successfully' };
                     }
                   }
                 }
@@ -227,8 +228,43 @@ export default class Users extends ArangoDataSource {
     }
   }
 
+  async updateProfile({ uid }, {
+    username, avator, displayName, email, phoneNumber,
+  }) {
+    const userData = {};
+    if (!uid) throw Error('User is not logged in');
+    if (avator) userData.photoURL = avator;
+    if (displayName) userData.displayName = displayName;
+    if (email) userData.email = email;
+    if (phoneNumber) userData.phoneNumber = phoneNumber;
+    const user = await admin.auth().updateUser(uid, userData).catch((e) => e);
+    if (user instanceof Error) {
+      throw user;
+    }
+    if (username) userData.username = username;
+    const data = {
+      username: userData.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      avator: user.photoURL,
+      displayName: user.displayName,
+      disable: user.disabled,
+      emailVerified: user.emailVerified,
+    };
+    const auser = await this.collection.update(user.uid, data)
+      .then(() => this.collection.document(user.uid)).catch((e) => e);
+    if (auser instanceof Error) {
+      throw auser;
+    }
+    return { user: auser, message: 'Profile updated successfully' };
+  }
+
   getUserByExample(args) {
     return this.collection.firstExample(args);
+  }
+
+  getUsersByExample(args) {
+    return this.collection.byExample(args).then((arr) => arr.all());
   }
 
   getUserById(id) {
