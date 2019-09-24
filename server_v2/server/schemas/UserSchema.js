@@ -10,6 +10,7 @@ type User {
     username: String!
     displayName: String
     phoneNumber: String
+    cover: String
     avator: String
     email: String!
     emailVerified: String
@@ -35,6 +36,7 @@ input ProfileUpdateInput{
     username: String
     email: String
     avator: String
+    cover: String
     phoneNumber: String!
 }
 type ProfilePayload{

@@ -229,10 +229,18 @@ export default class Users extends ArangoDataSource {
   }
 
   async updateProfile({ uid }, {
-    username, avator, displayName, email, phoneNumber,
+    username, avator, displayName, email, phoneNumber, cover,
   }) {
     const userData = {};
+    let newUsername;
     if (!uid) throw Error('User is not logged in');
+    const oldInfo = await this.collection.document(uid).catch((e) => e);
+    if (oldInfo instanceof Error) throw oldInfo;
+    // eslint-disable-next-line prefer-const
+    newUsername = username || oldInfo.username;
+    if (!isAlphanumeric(newUsername) || !isLength(newUsername, 3)) {
+      throw new Error('Username must be 3 characters or more and not contain special characters');
+    }
     if (avator) userData.photoURL = avator;
     if (displayName) userData.displayName = displayName;
     if (email) userData.email = email;
@@ -241,15 +249,16 @@ export default class Users extends ArangoDataSource {
     if (user instanceof Error) {
       throw user;
     }
-    if (username) userData.username = username;
+    userData.cover = cover || oldInfo.cover;
     const data = {
-      username: userData.username,
+      username: newUsername,
       email: user.email,
       phoneNumber: user.phoneNumber,
       avator: user.photoURL,
       displayName: user.displayName,
-      disable: user.disabled,
+      disabled: user.disabled,
       emailVerified: user.emailVerified,
+      cover: userData.cover,
     };
     const auser = await this.collection.update(user.uid, data)
       .then(() => this.collection.document(user.uid)).catch((e) => e);
