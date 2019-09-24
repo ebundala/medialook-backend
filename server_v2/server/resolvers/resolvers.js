@@ -5,11 +5,13 @@ import users, {
   startSession,
   linkIdProvider,
   updateProfile,
+  getUser,
 } from './users/UsersResolvers';
 
 const resolvers = {
   Query: {
     getUsers: users,
+    user: getUser,
   },
   Mutation: {
     signup,

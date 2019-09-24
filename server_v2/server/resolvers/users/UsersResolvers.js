@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 
 // eslint-disable-next-line no-unused-vars
-const usersResolver = (root, args, { dataSources }, info) => dataSources.users.getUsers(args);
+const usersResolver = (root, { input },
+  { dataSources }, info) => dataSources.users.getUsersByExample(input);
 
 export default usersResolver;
 
@@ -23,3 +24,6 @@ export const linkIdProvider = (root, { input },
 
 export const updateProfile = (root, { input },
   { dataSources, user }, info) => dataSources.users.updateProfile(user, input);
+
+export const getUser = (root, { input },
+  { dataSources }, info) => dataSources.users.getUserByExample(input);

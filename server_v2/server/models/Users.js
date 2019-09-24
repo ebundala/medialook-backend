@@ -269,22 +269,26 @@ export default class Users extends ArangoDataSource {
   }
 
   getUserByExample(args) {
-    return this.collection.firstExample(args);
+    return this.collection.firstExample(args).catch(() => { throw new Error('Not found'); });
   }
 
   getUsersByExample(args) {
-    return this.collection.byExample(args).then((arr) => arr.all());
+    if (args) {
+      return this.collection.byExample(args).then((arr) => arr.all())
+        .catch(() => { throw new Error('Not found'); });
+    }
+    return this.getUsers();
   }
 
   getUserById(id) {
-    return this.collection.document(id);
+    return this.collection.document(id).catch(() => { throw new Error('Not found'); });
   }
 
   getUsers() {
     return this.collection.all().then((arr) => arr.all().then((val) => {
       log(val);
       return val;
-    }));
+    })).catch((e) => e);
   }
 }
 

@@ -39,6 +39,9 @@ input ProfileUpdateInput{
     cover: String
     phoneNumber: String!
 }
+input FollowInput{
+      to: String!
+}
 type ProfilePayload{
     message: String!
     user: User!
@@ -53,6 +56,7 @@ type LogoutPayload{
     status: Boolean!
 }
 
+
 type Mutation {
     signup(input: SignUpInput!): User
     signin(input: SignInInput!): AuthPayload!
@@ -60,10 +64,23 @@ type Mutation {
     destroySession(sessionToken: String!): LogoutPayload!
     linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
-   
+       
 }
-
+input UserQueryInput{
+    _id: String
+    _key: String
+    username: String
+    email: String
+    phoneNumber: String
+    disabled: Boolean
+    emailVerified: Boolean
+    displayName: String
+    #todo impliment the logic for followes
+    followed: Boolean
+    followers: Boolean   
+}
 type Query {
-    getUsers:[User!]!
+    getUsers(input: UserQueryInput):[User!]!
+    user(input:UserQueryInput): User!
 }
 `;
