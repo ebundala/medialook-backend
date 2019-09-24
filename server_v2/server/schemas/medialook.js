@@ -170,7 +170,36 @@ enum ActionType{
 }
 union Content = Comment | Post | Feed | Report | User
 
+input SignUpInput{
+    username: String!
+    password: String!
+    email: String!
+}
+input SignInInput{
+    email: String!
+    password: String!
+}
+input ActionInput{
+    from: String!
+    to: String!
+}
+input CommentInput {
+    to: String!
+}
+type ActionPayload{
+    message: String
+    payload: Node
+
+}
 type Query {
       getUsers(userId: ID): [User]
+}
+type Mutation {
+    signup(input: SignUpInput!): User
+    signin(input: SignInInput!): User
+    createSession(idToken: String!): String
+    like(input: ActionInput!): ActionPayload
+    follow(input: ActionInput!): ActionPayload
+    comment(input: CommentInput!): Comment
 }
 `;

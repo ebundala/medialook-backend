@@ -8,4 +8,4 @@ export default (str) => str
   .replace(new RegExp('&iexcl;', 'g'), ' ')
   .replace(new RegExp('&laquo;', 'g'), ' ')
   .replace(new RegExp('&raquo;', 'g'), ' ')
-  .replace(new RegExp('&#039;', 'g'), '');
+  .replace(new RegExp('(&#)([0-9]*)', 'g'), '');

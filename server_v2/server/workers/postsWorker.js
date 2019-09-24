@@ -23,7 +23,7 @@ const {
 } = misc;
 
 
-const savePostToDB = async (data) => {
+const savePostToDB = (data) => {
   const { feedId, mediaName, post } = data;
   debug(post.author, mediaName, feedId);
   const col = DB.collection('Posts');
@@ -216,7 +216,7 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
     reject(e);
   }
 }).then((conn) => conn.createChannel())
-  .then(async (ch) => ch.assertQueue(POST_QUEUE)
+  .then((ch) => ch.assertQueue(POST_QUEUE)
     .then(() => ch.consume(POST_QUEUE, (msg) => {
       if (msg !== null) {
         const str = msg.content.toString();
@@ -225,7 +225,7 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
           .then(() => {
             ch.ack(msg);
           }).catch(() => {
-            ch.nack(msg);
+            ch.ack(msg);
           }));
       }
     }))).catch((e) => {

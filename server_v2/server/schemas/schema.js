@@ -1,7 +1,5 @@
-// import bizapp from './bizapp';
-import medialook from './medialook';
+import UserSchema from './UserSchema';
 
 export default [
-  // bizapp,
-  medialook,
+  UserSchema,
 ];

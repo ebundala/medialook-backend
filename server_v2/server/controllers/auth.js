@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { log } from 'console';
+/* import { log } from 'console';
 import { isEmail, isLength, isAlphanumeric } from 'validator';
 import admin, {
   createUserWithEmail, signInWithEmail, createSessionToken, destroySessionToken,
@@ -36,11 +36,14 @@ export const linkIDProvider = async (req, res) => {
         } = info;
 
         if (linked && role && _key === uid) {
-          res.status(400).json(new ApiError(true, 400, 'Provided token is already linked to a user'));
+          res.status(400).json(new ApiError(true, 400,
+             'Provided token is already linked to a user'));
         } else if (!isLength(username, 3)) {
-          res.status(400).json(new ApiError(true, 400, 'Username must be 3 characters or more'));
+          res.status(400).json(new ApiError(true, 400,
+             'Username must be 3 characters or more'));
         } else if (!isAlphanumeric(username)) {
-          res.status(400).json(new ApiError(true, 400, 'Username can not contain special characters'));
+          res.status(400).json(new ApiError(true, 400,
+             'Username can not contain special characters'));
         } else {
           const user = await admin.auth().getUser(uid).catch((error) => error);
           if (user instanceof Error) {
@@ -55,9 +58,12 @@ export const linkIDProvider = async (req, res) => {
             const exist2 = await users.firstExample({ username }).catch(() => false);
             if (exist) {
               // Todo handle case were user is in database and firebase but has no claims set
-              res.status(400).json(new ApiError(true, 400, 'The email address is already in use by another account'));
+              res.status(400)
+              .json(new ApiError(true,
+                 400, 'The email address is already in use by another account'));
             } else if (exist2) {
-              res.status(400).json(new ApiError(true, 400, 'The Username is already in use by another account'));
+              res.status(400)
+              .json(new ApiError(true, 400, 'The Username is already in use by another account'));
             } else {
               // link user here
               const auser = await users.save({
@@ -73,16 +79,19 @@ export const linkIDProvider = async (req, res) => {
               }).catch((error) => error);
 
               if (auser instanceof Error) {
-                res.status(500).json(new ApiError(auser, 500, auser.message || 'Failed to create user account'));
+                res.status(500).json(new ApiError(auser, 500,
+                  auser.message || 'Failed to create user account'));
               } else {
                 // set claims here
                 const setClaims = await setUserClaims(auser);
                 if (setClaims) {
                   const data = await users.document(auser).catch((error) => error);
                   if (data instanceof Error) {
-                    res.status(500).json(new ApiError(data, 500, data.message || 'Failed to get user info with session'));
+                    res.status(500).json(new ApiError(data, 500,
+                      data.message || 'Failed to get user info with session'));
                   } else {
-                    res.status(200).json(new ApiSuccess(data, 200, 'User linked with provider successfully'));
+                    res.status(200).json(new ApiSuccess(data, 200,
+                      'User linked with provider successfully'));
                   }
                 }
               }
@@ -108,9 +117,11 @@ export const signUpHandler = async (req, res) => {
     const exist = await users.firstExample({ email }).catch(() => false);
     const exist2 = await users.firstExample({ username }).catch(() => false);
     if (exist) {
-      res.status(400).json(new ApiError(true, 400, 'The email address is already in use by another account'));
+      res.status(400)
+      .json(new ApiError(true, 400, 'The email address is already in use by another account'));
     } else if (exist2) {
-      res.status(400).json(new ApiError(true, 400, 'The Username is already in use by another account'));
+      res.status(400)
+      .json(new ApiError(true, 400, 'The Username is already in use by another account'));
     } else {
       createUserWithEmail(email, password, username)
         .then((user) => users.save({
@@ -177,3 +188,4 @@ export const revokeSession = async (req, res) => {
     }
   }
 };
+*/
