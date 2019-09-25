@@ -6,6 +6,7 @@ import users, {
   linkIdProvider,
   updateProfile,
   getUser,
+  followUser,
 } from './users/UsersResolvers';
 
 const resolvers = {
@@ -20,6 +21,7 @@ const resolvers = {
     destroySession,
     linkIdProvider,
     updateProfile,
+    followUser,
   },
   /* AuthPayload: {
     sessionToken: (parent, args, context) => {

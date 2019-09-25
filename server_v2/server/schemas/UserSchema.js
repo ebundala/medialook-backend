@@ -39,8 +39,13 @@ input ProfileUpdateInput{
     cover: String
     phoneNumber: String!
 }
+enum ActionType{
+    DO
+    UNDO
+}
 input ActionInput{
       to: String!
+      type: ActionType!
 }
 type ProfilePayload{
     message: String!
@@ -67,7 +72,7 @@ type Mutation {
     destroySession(sessionToken: String!): LogoutPayload!
     linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
-    follow(input: ActionInput!): ActionPayload!
+    followUser(input: ActionInput!): ActionPayload!
        
 }
 input UserQueryInput{

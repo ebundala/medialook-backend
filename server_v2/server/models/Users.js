@@ -19,7 +19,9 @@ const signInWithEmailPath = `/v1/accounts:signInWithPassword?key=${env.FIREBASE_
 export default class Users extends ArangoDataSource {
   constructor() {
     super(DB);
-    this.collection = DB.collection('Users');
+    this.usersCol = DB.collection('Users');
+    this.followsCol = DB.edgeCollection('Follows');
+    this.likeCol = DB.edgeCollection('Likes');
   }
 
   /* get collection() {
@@ -38,7 +40,7 @@ export default class Users extends ArangoDataSource {
     } else if (!isAlphanumeric(username)) {
       throw new Error('Username can not contain special characters');
     } else {
-      const users = this.collection;
+      const users = this.usersCol;
       const exist = await users.firstExample({ email }).catch(() => false);
       const exist2 = await users.firstExample({ username }).catch(() => false);
       if (exist) {
@@ -135,7 +137,7 @@ export default class Users extends ArangoDataSource {
           return admin.auth().createSessionCookie(idToken, { expiresIn })
             // eslint-disable-next-line arrow-body-style
             .then((sessionToken) => {
-              return this.collection.document(decodedIdToken.uid)
+              return this.usersCol.document(decodedIdToken.uid)
               // eslint-disable-next-line arrow-body-style
                 .then((user) => { return { user, sessionToken, message: 'Session created successfully' }; });
             });
@@ -228,16 +230,24 @@ export default class Users extends ArangoDataSource {
     }
   }
 
-  async updateProfile({ uid }, {
+  async updateProfile(user, {
     username, avator, displayName, email, phoneNumber, cover,
   }) {
+    if (!user._id) throw Error('User is not logged in');
     const userData = {};
     let newUsername;
-    if (!uid) throw Error('User is not logged in');
-    const oldInfo = await this.collection.document(uid).catch((e) => e);
-    if (oldInfo instanceof Error) throw oldInfo;
+    if (username) {
+      const exist = await this.usersCol.firstExample({ username }).catch((e) => e);
+      if (!(exist instanceof Error)) {
+        if (exist._key !== user._key) {
+          throw new Error('Username already in use with another account');
+        }
+      }
+    }
+    // const oldInfo = await this.usersCol.document(_id).catch((e) => e);
+    // if (oldInfo instanceof Error) throw oldInfo;
     // eslint-disable-next-line prefer-const
-    newUsername = username || oldInfo.username;
+    newUsername = username || user.username;
     if (!isAlphanumeric(newUsername) || !isLength(newUsername, 3)) {
       throw new Error('Username must be 3 characters or more and not contain special characters');
     }
@@ -245,23 +255,24 @@ export default class Users extends ArangoDataSource {
     if (displayName) userData.displayName = displayName;
     if (email) userData.email = email;
     if (phoneNumber) userData.phoneNumber = phoneNumber;
-    const user = await admin.auth().updateUser(uid, userData).catch((e) => e);
-    if (user instanceof Error) {
-      throw user;
+    const fuser = await admin.auth().updateUser(user._key, userData).catch((e) => e);
+    if (fuser instanceof Error) {
+      const { message } = fuser;
+      throw new Error(message || 'Failed to update firebase user');
     }
-    userData.cover = cover || oldInfo.cover;
+    userData.cover = cover || user.cover;
     const data = {
       username: newUsername,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      avator: user.photoURL,
-      displayName: user.displayName,
-      disabled: user.disabled,
-      emailVerified: user.emailVerified,
+      email: fuser.email,
+      phoneNumber: fuser.phoneNumber,
+      avator: fuser.photoURL,
+      displayName: fuser.displayName,
+      disabled: fuser.disabled,
+      emailVerified: fuser.emailVerified,
       cover: userData.cover,
     };
-    const auser = await this.collection.update(user.uid, data)
-      .then(() => this.collection.document(user.uid)).catch((e) => e);
+    const auser = await this.usersCol.update(user._id, data)
+      .then(() => this.usersCol.document(user._id)).catch((e) => e);
     if (auser instanceof Error) {
       throw auser;
     }
@@ -269,26 +280,65 @@ export default class Users extends ArangoDataSource {
   }
 
   getUserByExample(args) {
-    return this.collection.firstExample(args).catch(() => { throw new Error('Not found'); });
+    return this.usersCol.firstExample(args).catch(() => { throw new Error('Not found'); });
   }
 
   getUsersByExample(args) {
     if (args) {
-      return this.collection.byExample(args).then((arr) => arr.all())
+      return this.usersCol.byExample(args).then((arr) => arr.all())
         .catch(() => { throw new Error('Not found'); });
     }
     return this.getUsers();
   }
 
   getUserById(id) {
-    return this.collection.document(id).catch(() => { throw new Error('Not found'); });
+    return this.usersCol.document(id).catch((e) => {
+      const { message } = e;
+      throw new Error(message || 'Not found');
+    });
   }
 
   getUsers() {
-    return this.collection.all().then((arr) => arr.all().then((val) => {
+    return this.usersCol.all().then((arr) => arr.all().then((val) => {
       log(val);
       return val;
     })).catch((e) => e);
+  }
+
+  followUser({ _id }, { to, type }) {
+    if (!_id) throw Error('User is not logged in');
+    const from = _id;
+    if (type === 'DO') {
+      const createdAt = (new Date()).toISOString();
+
+
+      return this.followsCol.save({ createdAt }, from, to).then(async () => {
+        const user = await this.usersCol.document(to).catch((e) => e);
+        if (user instanceof Error) {
+          const { message } = user;
+          throw new Error(message || 'Item was not found');
+        }
+        return { node: user, message: 'Followed successfully' };
+      }).catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to follow');
+      });
+    }
+    if (type === 'UNDO') {
+      return this.followsCol.removeByExample({ _from: from, _to: to })
+        .then(async () => {
+          const user = await this.usersCol.document(to).catch((e) => e);
+          if (user instanceof Error) {
+            const { message } = user;
+            throw new Error(message || 'User was not found');
+          }
+          return { node: user, message: 'Unfollowed User successfully' };
+        }).catch((e) => {
+          const { message } = e;
+          throw new Error(message || 'Failed to unfollow User');
+        });
+    }
+    throw new Error('Invalid Operation');
   }
 }
 

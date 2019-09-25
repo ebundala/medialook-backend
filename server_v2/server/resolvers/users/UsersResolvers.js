@@ -27,3 +27,6 @@ export const updateProfile = (root, { input },
 
 export const getUser = (root, { input },
   { dataSources }, info) => dataSources.users.getUserByExample(input);
+
+export const followUser = (root, { input },
+  { dataSources, user }, info) => dataSources.users.followUser(user, input);
