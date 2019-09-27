@@ -21,6 +21,27 @@ input FeedInput {
     offset: Int!
     limit: Int!
 }
+input FeedEditInput{
+    _id: ID!
+    categoryName: String
+    countryCode: String
+    feedUrl: String
+    feedName: String
+    mediaName: String
+    url: String
+    featuredImage: String
+}
+input FeedDeleteInput {
+    _id: ID!
+}
+type FeedDeletePayload{
+    message: String!
+    _id: ID!
+}
+type FeedEditPayload{
+    message: String!
+    feed: Feed!
+}
 type FeedPayload {
     message: String
     cursor: String
@@ -28,5 +49,7 @@ type FeedPayload {
 }
 extend type Mutation{
     addFeed(input: FeedInput!): FeedPayload
+    editFeed(input: FeedEditInput!): FeedEditPayload
+    deleteFeed(input: FeedDeleteInput!): FeedDeletePayload
 }
 `;

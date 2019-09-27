@@ -63,8 +63,8 @@ type LogoutPayload{
  union Content = User | Feed
 type ActionPayload {
     message: String
-    node: Content #Todo use a union for other types in future
-}
+    node: Content 
+    }
 type Mutation {
     signup(input: SignUpInput!): User
     signin(input: SignInInput!): AuthPayload!
