@@ -12,6 +12,8 @@ import users, {
 import addFeed,
 {
   followFeed,
+  deleteFeed,
+  editFeed,
 } from './feeds/FeedsResolvers';
 
 const parseType = (id) => {
@@ -38,6 +40,8 @@ const resolvers = {
     linkIdProvider,
     updateProfile,
     addFeed,
+    deleteFeed,
+    editFeed,
     follow: (parent, args, context, info) => {
       const { input } = args;
       const { to } = input;

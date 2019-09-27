@@ -163,4 +163,38 @@ export default class Feeds extends ArangoDataSource {
     }
     throw new Error('Invalid Operation');
   }
+
+  async editFeed({ isAdmin }, {
+    _id,
+    categoryName, countryCode,
+    feedUrl, url, mediaName, feedName, featuredImage,
+  }) {
+    if (!isAdmin) throw new Error('User has no permission to edit feed');
+    const data = {};
+    if (categoryName) data.categoryName = categoryName;
+    if (countryCode) data.countryCode = countryCode;
+    if (feedUrl && isURL(feedUrl)) data.feedUrl = feedUrl;
+    if (url && isURL(url)) data.url = url;
+    if (mediaName) data.mediaName = mediaName;
+    if (feedName) data.feedName = feedName;
+    if (featuredImage && isURL(featuredImage)) data.featuredImage = featuredImage;
+    data.updatedAt = (new Date()).toISOString();
+    const feed = await this.feedCol.update(_id, data)
+      .then((res) => this.feedCol.document(_id))
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to update feed');
+      });
+
+    return { message: 'Feed updated successfully', feed };
+  }
+
+  async deleteFeed({ isAdmin }, { _id }) {
+    if (!isAdmin) throw new Error('User has no permission to delete a feed');
+    const res = await this.feedCol.remove(_id).catch((e) => {
+      const { message } = e;
+      throw new Error(message || 'Failed to delete feed');
+    });
+    return { message: 'Feed deleted successfully', _id };
+  }
 }
