@@ -127,4 +127,40 @@ export default class Feeds extends ArangoDataSource {
     }
     return { message: 'Operation is successfull', feeds };
   }
+
+  followFeed({ _id }, { to, type }) {
+    if (!_id) throw Error('User is not logged in');
+    const from = _id;
+    if (type === 'DO') {
+      const createdAt = (new Date()).toISOString();
+
+
+      return this.followsCol.save({ createdAt }, from, to).then(async () => {
+        const feed = await this.feedCol.document(to).catch((e) => e);
+        if (feed instanceof Error) {
+          const { message } = feed;
+          throw new Error(message || 'Item was not found');
+        }
+        return { node: feed, message: 'Followed successfully' };
+      }).catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to follow');
+      });
+    }
+    if (type === 'UNDO') {
+      return this.followsCol.removeByExample({ _from: from, _to: to })
+        .then(async () => {
+          const feed = await this.feedCol.document(to).catch((e) => e);
+          if (feed instanceof Error) {
+            const { message } = feed;
+            throw new Error(message || 'Feed was not found');
+          }
+          return { node: feed, message: 'Unfollowed feed successfully' };
+        }).catch((e) => {
+          const { message } = e;
+          throw new Error(message || 'Failed to unfollow Feed');
+        });
+    }
+    throw new Error('Invalid Operation');
+  }
 }

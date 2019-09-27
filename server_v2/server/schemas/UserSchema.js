@@ -60,10 +60,10 @@ type LogoutPayload{
     message: String!
     status: Boolean!
 }
-# union Content = User | 
+ union Content = User | Feed
 type ActionPayload {
     message: String
-    node: User #Todo use a union for other types in future
+    node: Content #Todo use a union for other types in future
 }
 type Mutation {
     signup(input: SignUpInput!): User
@@ -72,7 +72,7 @@ type Mutation {
     destroySession(sessionToken: String!): LogoutPayload!
     linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
-    followUser(input: ActionInput!): ActionPayload!
+    follow(input: ActionInput!): ActionPayload!
        
 }
 input UserQueryInput{
