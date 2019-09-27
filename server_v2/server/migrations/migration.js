@@ -34,8 +34,9 @@ const importMedias = async () => {
         url,
         updatedAt,
       } = item;
-
+      const textIndex = `${mediaName} ${url} ${feedUrl} ${feedName}`;
       return {
+        textIndex,
         featuredImage,
         feedName,
         countryCode,
@@ -157,9 +158,9 @@ const importPosts = () => {
   });
 };
 
-const importReports = () => {
+const importReports = async () => {
   const { result } = reports;
-  result.map((item) => {
+  const data = result.map((item) => {
     const {
       country,
       altitude,
@@ -193,7 +194,15 @@ const importReports = () => {
       longitude,
     };
   });
+  const col = DB.collection('Reports');
+  const res = await col.save(data).catch((e) => e);
+  if (res instanceof Error) {
+    log(res);
+  } else {
+    log(res);
+  }
 };
+importReports();
 const importComments = () => {
   const { result } = comments;
   result.map((item) => {

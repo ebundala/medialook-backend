@@ -8,6 +8,7 @@ import users, {
   getUser,
   followUser,
 } from './users/UsersResolvers';
+import addFeed from './feeds/FeedsResolvers';
 
 const resolvers = {
   Query: {
@@ -22,6 +23,7 @@ const resolvers = {
     linkIdProvider,
     updateProfile,
     followUser,
+    addFeed,
   },
   /* AuthPayload: {
     sessionToken: (parent, args, context) => {

@@ -3,6 +3,7 @@ import typeDefs from '../schemas/schema';
 import resolvers from '../resolvers/resolvers';
 import sessionTokenAuth from '../middlewares/tokenAuth';
 import UsersDataSource from '../models/Users';
+import FeedDataSource from '../models/Feeds';
 
 export default new ApolloServer({
   typeDefs,
@@ -15,5 +16,6 @@ export default new ApolloServer({
   },
   dataSources: () => ({
     users: new UsersDataSource(),
+    feeds: new FeedDataSource(),
   }),
 });

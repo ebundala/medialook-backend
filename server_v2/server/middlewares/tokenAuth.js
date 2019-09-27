@@ -12,7 +12,7 @@ export default async (req) => {
         .then(({ uid }) => DB.collection('Users').document(uid))
         .catch((e) => e);
       if (claims instanceof Error) {
-        log(claims);
+        log(claims.message);
         return {};
       }
       return claims;
