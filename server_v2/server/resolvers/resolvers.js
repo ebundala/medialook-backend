@@ -9,12 +9,18 @@ import users, {
   getUser,
   followUser,
 } from './users/UsersResolvers';
-import addFeed,
+import
 {
+  addFeed,
   followFeed,
   deleteFeed,
   editFeed,
 } from './feeds/FeedsResolvers';
+import {
+  createReport,
+  editReport,
+  deleteReport,
+} from './reports/ReportResolvers';
 
 const parseType = (id) => {
   const [type] = id.split('/');
@@ -42,6 +48,9 @@ const resolvers = {
     addFeed,
     deleteFeed,
     editFeed,
+    createReport,
+    editReport,
+    deleteReport,
     follow: (parent, args, context, info) => {
       const { input } = args;
       const { to } = input;

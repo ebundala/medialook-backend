@@ -20,7 +20,7 @@ export const destroySession = (root, { sessionToken },
   { dataSources }, info) => dataSources.users.destroySessionToken(sessionToken);
 
 export const linkIdProvider = (root, { input },
-  { dataSources }, info) => dataSources.linkIdProvider(input);
+  { dataSources }, info) => dataSources.users.linkIdProvider(input);
 
 export const updateProfile = (root, { input },
   { dataSources, user }, info) => dataSources.users.updateProfile(user, input);

@@ -20,7 +20,14 @@ type Report {
     region: String
     text: String!
 }
-type ReportInput {
+input ImageInput{
+    type: String
+    url: String!
+    width: Int 
+    height: Int 
+    length: Int
+}
+input ReportInput {
     country: String
     altitude: Float
     latitude: Float
@@ -29,13 +36,41 @@ type ReportInput {
     subLocality: String
     isoCountryCode: String
     locationName: String
-    enclosures: [Image!]
+    enclosures: [ImageInput!]
     district: String
     region: String
     text: String!
 }
+ input ReportEditInput{
+     _id: ID!
+    country: String
+    altitude: Float
+    latitude: Float
+    longitude: Float
+    locality: String
+    subLocality: String
+    isoCountryCode: String
+    locationName: String
+    enclosures: [ImageInput!]
+    district: String
+    region: String
+    text: String!
+}
+input DeleteInput{
+    _id: ID!
+}
 type ReportPayload {
     message: String!
     report: Report!
+}
+type ReportDeletePayload{
+    message: String!
+    _id: ID!
+}
+
+extend type Mutation {
+    createReport(input: ReportInput!): ReportPayload   
+    editReport(input: ReportEditInput!): ReportPayload
+    deleteReport(input: DeleteInput!): ReportDeletePayload
 }
 `;

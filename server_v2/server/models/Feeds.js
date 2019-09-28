@@ -6,6 +6,7 @@ import RssDiscover from 'rss-finder';
 import { log } from 'console';
 import { isURL } from 'validator';
 import { aql } from 'arangojs';
+// import { GraphQLError } from 'graphql';
 import msc from '../config/misc';
 import DB from '../config/db';
 import ArangoDataSource from './arangoDatasource/arangoDatasource';
