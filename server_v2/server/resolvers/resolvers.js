@@ -22,14 +22,29 @@ import {
   deleteReport,
 } from './reports/ReportResolvers';
 
+import {
+  comment,
+  editComment,
+  deleteComment,
+} from './comments/CommentsResolvers';
+
 const parseType = (id) => {
   const [type] = id.split('/');
   switch (type) {
     case 'Feeds':
       return 'Feed';
     case 'Users':
-    default:
       return 'User';
+    case 'Posts':
+      return 'Post';
+    case 'Reports':
+      return 'Report';
+    case 'Comments':
+      return 'Comment';
+    case 'Reviews':
+      return 'Review';
+    default:
+      return null;
   }
 };
 
@@ -51,6 +66,9 @@ const resolvers = {
     createReport,
     editReport,
     deleteReport,
+    comment,
+    deleteComment,
+    editComment,
     follow: (parent, args, context, info) => {
       const { input } = args;
       const { to } = input;

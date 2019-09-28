@@ -36,6 +36,15 @@ export default class ArangoDataSource extends DataSource {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  parseType(id) {
+    if (id) {
+      const [type] = id.toString().split('/');
+      return type;
+    }
+    return null;
+  }
+
   cacheQuery(ttl = 5, query) {
     const cacheKey = crypto
       .createHash('sha1')

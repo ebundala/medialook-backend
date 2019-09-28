@@ -8,5 +8,13 @@ type Image {
      height: Int
      length: Int
 }
-
+input DeleteInput{
+    _id: ID!
+}
+type DeletePayload{
+    message: String!
+    _id: ID!
+}
+# union Subject = Report | Post  
+union Content = User | Feed | Post | Report | Comment
 `;

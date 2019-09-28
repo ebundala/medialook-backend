@@ -56,21 +56,16 @@ input ReportInput {
     region: String
     text: String!
 }
-input DeleteInput{
-    _id: ID!
-}
+
 type ReportPayload {
     message: String!
     report: Report!
 }
-type ReportDeletePayload{
-    message: String!
-    _id: ID!
-}
+
 
 extend type Mutation {
     createReport(input: ReportInput!): ReportPayload   
     editReport(input: ReportEditInput!): ReportPayload
-    deleteReport(input: DeleteInput!): ReportDeletePayload
+    deleteReport(input: DeleteInput!): DeletePayload
 }
 `;

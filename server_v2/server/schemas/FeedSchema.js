@@ -31,13 +31,7 @@ input FeedEditInput{
     url: String
     featuredImage: String
 }
-input FeedDeleteInput {
-    _id: ID!
-}
-type FeedDeletePayload{
-    message: String!
-    _id: ID!
-}
+
 type FeedEditPayload{
     message: String!
     feed: Feed!
@@ -50,6 +44,6 @@ type FeedPayload {
 extend type Mutation{
     addFeed(input: FeedInput!): FeedPayload
     editFeed(input: FeedEditInput!): FeedEditPayload
-    deleteFeed(input: FeedDeleteInput!): FeedDeletePayload
+    deleteFeed(input: DeleteInput!): DeletePayload
 }
 `;

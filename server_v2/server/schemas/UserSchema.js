@@ -60,7 +60,6 @@ type LogoutPayload{
     message: String!
     status: Boolean!
 }
- union Content = User | Feed
 type ActionPayload {
     message: String
     node: Content 
