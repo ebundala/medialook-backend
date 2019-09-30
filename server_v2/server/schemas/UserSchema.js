@@ -72,6 +72,7 @@ type Mutation {
     linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
     follow(input: ActionInput!): ActionPayload!
+    like(input:ActionInput!): ActionPayload!
        
 }
 input UserQueryInput{

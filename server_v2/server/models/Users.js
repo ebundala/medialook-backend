@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
 import { log } from 'console';
+import { aql } from 'arangojs';
 import { isEmail, isLength, isAlphanumeric } from 'validator';
 import { https } from 'request-easy';
 import admin from './admin';
@@ -21,15 +22,9 @@ export default class Users extends ArangoDataSource {
     super(DB);
     this.usersCol = DB.collection('Users');
     this.followsCol = DB.edgeCollection('Follows');
-    this.likeCol = DB.edgeCollection('Likes');
+    this.likeCol = DB.edgeCollection('Like');
   }
 
-  /* get collection() {
-    return this.db.collection('users');
-  }
-  set collection(coll){
-   this.col =
-  } */
   async signupWithEmail({ email, password, username }) {
     if (!isEmail(email)) {
       throw new Error('Invalid Email');
@@ -305,37 +300,63 @@ export default class Users extends ArangoDataSource {
     })).catch((e) => e);
   }
 
-  followUser({ _id }, { to, type }) {
+  follow({ _id }, { to, type }) {
     if (!_id) throw Error('User is not logged in');
-    const from = _id;
+    const createdAt = (new Date()).toISOString();
+    const q = aql`RETURN DOCUMENT(${to})`;
     if (type === 'DO') {
-      const createdAt = (new Date()).toISOString();
-
-
-      return this.followsCol.save({ createdAt }, from, to).then(async () => {
-        const user = await this.usersCol.document(to).catch((e) => e);
-        if (user instanceof Error) {
-          const { message } = user;
+      return this.followsCol.save({ createdAt }, _id, to).then(async () => {
+        const node = await this.db.query(q).then((arr) => arr.next()).catch((e) => e);
+        if (node instanceof Error) {
+          const { message } = node;
           throw new Error(message || 'Item was not found');
         }
-        return { node: user, message: 'Followed successfully' };
+        return { node, message: 'Followed successfully' };
       }).catch((e) => {
         const { message } = e;
         throw new Error(message || 'Failed to follow');
       });
     }
     if (type === 'UNDO') {
-      return this.followsCol.removeByExample({ _from: from, _to: to })
+      return this.followsCol.removeByExample({ _from: _id, _to: to })
         .then(async () => {
-          const user = await this.usersCol.document(to).catch((e) => e);
+          const user = await this.db.query(q).then((arr) => arr.next()).catch((e) => e);
           if (user instanceof Error) {
             const { message } = user;
-            throw new Error(message || 'User was not found');
+            throw new Error(message || 'Item was not found');
           }
-          return { node: user, message: 'Unfollowed User successfully' };
+          return { node: user, message: 'Unfollowed successfully' };
         }).catch((e) => {
           const { message } = e;
-          throw new Error(message || 'Failed to unfollow User');
+          throw new Error(message || 'Failed to unfollow ');
+        });
+    }
+    throw new Error('Invalid Operation');
+  }
+
+  async like({ _id }, { to, type }) {
+    if (!_id) throw Error('User is not logged in');
+    const createdAt = (new Date()).toISOString();
+    const q = aql`RETURN DOCUMENT(${to})`;
+
+    if (type === 'DO') {
+      const node = await this.likeCol.save({ createdAt }, _id, to)
+        .then(() => this.db.query(q).then((arr) => arr.next()))
+        .catch((e) => {
+          const { message } = e;
+          throw new Error(message || 'Failed to like item');
+        });
+      return { message: 'Liked item successfully', node };
+    }
+    if (type === 'UNDO') {
+      return this.likeCol.removeByExample({ _from: _id, _to: to })
+        .then(async () => {
+          const node = await this.db.query(q).then((arr) => arr.next()).catch((e) => e);
+          if (node instanceof Error) {
+            const { message } = node;
+            throw new Error(message || 'Item was not found');
+          }
+          return { node, message: 'Unliked item successfully' };
         });
     }
     throw new Error('Invalid Operation');

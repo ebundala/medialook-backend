@@ -7,12 +7,12 @@ import users, {
   linkIdProvider,
   updateProfile,
   getUser,
-  followUser,
+  follow,
+  like,
 } from './users/UsersResolvers';
 import
 {
   addFeed,
-  followFeed,
   deleteFeed,
   editFeed,
 } from './feeds/FeedsResolvers';
@@ -69,15 +69,8 @@ const resolvers = {
     comment,
     deleteComment,
     editComment,
-    follow: (parent, args, context, info) => {
-      const { input } = args;
-      const { to } = input;
-      const type = parseType(to);
-      if (type === 'Feed') {
-        return followFeed(parent, args, context, info);
-      }
-      return followUser(parent, args, context, info);
-    },
+    follow,
+    like,
   },
   Content: {
     // eslint-disable-next-line no-underscore-dangle

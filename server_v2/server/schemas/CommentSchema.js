@@ -19,7 +19,10 @@ type Comment {
     _id: ID!
     _key: String!
     _rev: String!
+    _from: String!
+    _to: String!
     commentText: String!
+    createdAt: String
 }
 
 extend type Mutation {

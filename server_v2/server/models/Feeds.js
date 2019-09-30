@@ -48,12 +48,18 @@ export default class Feeds extends ArangoDataSource {
   }
 
   async addFeed(user, { query, offset, limit }) {
-    // log(query, offset, limit);
+    const q = `%${query.toString().toLowerCase()}%`;
     const aq = aql`
-    FOR feed IN FULLTEXT('Feeds','textIndex',${query})
-    LIMIT ${offset}, ${limit}
-    return feed
-    `;
+                  FOR feed IN Feeds
+                  LET q = (${q})
+                  FILTER LOWER(feed.feedName) LIKE q
+                  OR LOWER(feed.url) like q
+                  OR LOWER(feed.feedUrl) like q
+                  OR LOWER(feed.mediaName) like q
+                  SORT feed.feedName
+                  LIMIT ${offset}, ${limit}
+                  RETURN feed
+                  `;
     const feeds = await this.db.query(aq)
       .then((arr) => arr.all()).catch((e) => {
         const { message } = e;
@@ -80,8 +86,8 @@ export default class Feeds extends ArangoDataSource {
           feedName: replaceHtml(feed.head.title),
 
         };
-        const result = await this.feedCol.save(media)
-          .then((data) => this.feedCol.document(data)).catch((e) => {
+        const result = await this.feedCol.save(media, { returnNew: true })
+          .then((data) => data.new).catch((e) => {
             const { message } = e;
             throw new Error(message || 'Failed to add the feed ');
           });
@@ -107,15 +113,17 @@ export default class Feeds extends ArangoDataSource {
           const textIndex = `${fd.mediaName} ${fd.url} ${fd.feedUrl} ${fd.feedName}`;
           return { textIndex, ...fd };
         });
-        const result = await this.feedCol.save(medias).then((data) => {
+        const result = await this.feedCol.save(medias, { returnNew: true }).then((data) => {
           log(data);
-          const conditions = medias.map((fd) => fd.feedUrl);
+          return data.map((item) => item.new);
+          // Todo use return new instead of issuing a new query
+          /* const conditions = medias.map((fd) => fd.feedUrl);
           const aquery = aql`
                 FOR doc IN Feeds
                 FILTER doc.feedUrl IN ${conditions}
                 RETURN doc
                 `;
-          return this.db.query(aquery).then((arr) => arr.all());
+          return this.db.query(aquery).then((arr) => arr.all()); */
         }).catch((e) => {
           const { message } = e;
           throw new Error(message || 'Failed to add the feeds');
@@ -180,8 +188,8 @@ export default class Feeds extends ArangoDataSource {
     if (feedName) data.feedName = feedName;
     if (featuredImage && isURL(featuredImage)) data.featuredImage = featuredImage;
     data.updatedAt = (new Date()).toISOString();
-    const feed = await this.feedCol.update(_id, data)
-      .then((res) => this.feedCol.document(_id))
+    const feed = await this.feedCol.update(_id, data, { returnNew: true })
+      .then((res) => res.new)
       .catch((e) => {
         const { message } = e;
         throw new Error(message || 'Failed to update feed');

@@ -202,7 +202,7 @@ const importReports = async () => {
     log(res);
   }
 };
-importReports();
+// importReports();
 const importComments = () => {
   const { result } = comments;
   result.map((item) => {

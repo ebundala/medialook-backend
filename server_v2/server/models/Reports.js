@@ -43,10 +43,10 @@ export default class Reports extends ArangoDataSource {
         text,
         createdAt,
       },
+      { returnNew: true },
     )
       .then((res) => this.reportedCol.save({ createdAt }, _id, res)
-        .then(() => res))
-      .then((res) => this.reportCol.document(res))
+        .then(() => res.new))
       .catch((e) => {
         const { message } = e;
         throw new GraphQLError(message || 'Failed to create a report');
@@ -84,8 +84,8 @@ export default class Reports extends ArangoDataSource {
     if (district) data.district = district;
     if (region) data.region = region;
     if (text) data.text = text;
-    const report = await this.reportCol.update(_id, data)
-      .then(() => this.reportCol.document(_id)).catch((e) => {
+    const report = await this.reportCol.update(_id, data, { returnNew: true })
+      .then((res) => res.new).catch((e) => {
         const { message } = e;
         throw new GraphQLError(message || 'Failed to update the report');
       });
