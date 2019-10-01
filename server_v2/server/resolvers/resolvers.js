@@ -1,12 +1,13 @@
 
-import users, {
+import {
   signin,
   signup,
   destroySession,
   startSession,
   linkIdProvider,
   updateProfile,
-  getUser,
+  getUser as user,
+  getUsers,
   follow,
   like,
 } from './users/UsersResolvers';
@@ -27,6 +28,7 @@ import {
   editComment,
   deleteComment,
 } from './comments/CommentsResolvers';
+import { getPosts } from './posts/PostsResolvers';
 
 const parseType = (id) => {
   const [type] = id.split('/');
@@ -50,8 +52,9 @@ const parseType = (id) => {
 
 const resolvers = {
   Query: {
-    getUsers: users,
-    user: getUser,
+    getUsers,
+    user,
+    getPosts,
   },
   Mutation: {
     signup,

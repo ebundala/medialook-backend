@@ -16,5 +16,18 @@ type Post {
     author: String!
     link: String!
     guid: String
+    feed: Feed
+}
+input PostQueryInput {
+    id: ID
+    categoryName: String
+    countryCode: String
+    followed: Boolean!
+    feedId: ID
+    offset: Int!
+    limit: Int!
+}
+extend type Query {
+    getPosts(input: PostQueryInput!): [Post]
 }
 `;

@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
 
 // eslint-disable-next-line no-unused-vars
-const usersResolver = (root, { input },
+export const getUsers = (root, { input },
   { dataSources }, info) => dataSources.users.getUsersByExample(input);
 
-export default usersResolver;
 
 export const signin = (root, { input },
   { dataSources }, info) => dataSources.users.signInWithEmail(input);

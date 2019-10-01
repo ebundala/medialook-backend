@@ -6,6 +6,7 @@ import UsersDataSource from '../models/Users';
 import FeedDataSource from '../models/Feeds';
 import ReportDataSource from '../models/Reports';
 import CommentsDatasource from '../models/Comments';
+import PostsDatasource from '../models/Posts';
 
 export default new ApolloServer({
   typeDefs,
@@ -21,5 +22,6 @@ export default new ApolloServer({
     feeds: new FeedDataSource(),
     reports: new ReportDataSource(),
     comments: new CommentsDatasource(),
+    posts: new PostsDatasource(),
   }),
 });
