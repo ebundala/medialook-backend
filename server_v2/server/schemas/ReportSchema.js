@@ -19,7 +19,10 @@ type Report {
     district: String
     region: String
     text: String!
+    tagName: String
+    author: User
 }
+
 input ImageInput{
     type: String
     url: String!
@@ -27,6 +30,7 @@ input ImageInput{
     height: Int 
     length: Int
 }
+
 input ReportInput {
     country: String
     altitude: Float
@@ -40,7 +44,9 @@ input ReportInput {
     district: String
     region: String
     text: String!
+    tagName: String!
 }
+
  input ReportEditInput{
      _id: ID!
     country: String
@@ -55,6 +61,17 @@ input ReportInput {
     district: String
     region: String
     text: String!
+    tagName: String
+}
+
+input ReportQueryInput {
+    id: ID
+    userId: ID
+    tagName: String
+    followed: Boolean
+    isoCountryCode: String
+    offset: Int!
+    limit: Int!
 }
 
 type ReportPayload {
@@ -62,10 +79,13 @@ type ReportPayload {
     report: Report!
 }
 
-
 extend type Mutation {
     createReport(input: ReportInput!): ReportPayload   
     editReport(input: ReportEditInput!): ReportPayload
     deleteReport(input: DeleteInput!): DeletePayload
+}
+
+extend type Query{
+    getReports(input: ReportQueryInput!): [Report]
 }
 `;

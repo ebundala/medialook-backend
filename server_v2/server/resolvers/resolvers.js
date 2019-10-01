@@ -21,6 +21,7 @@ import {
   createReport,
   editReport,
   deleteReport,
+  getReports,
 } from './reports/ReportResolvers';
 
 import {
@@ -55,6 +56,7 @@ const resolvers = {
     getUsers,
     user,
     getPosts,
+    getReports,
   },
   Mutation: {
     signup,

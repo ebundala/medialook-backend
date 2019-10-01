@@ -7,3 +7,6 @@ export const editReport = (root, { input },
 
 export const deleteReport = (root, { input },
   { dataSources, user }, info) => dataSources.reports.deleteReport(user, input);
+
+export const getReports = (root, { input },
+  { dataSources, user }, info) => dataSources.reports.getReports(user, input);

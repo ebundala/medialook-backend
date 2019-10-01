@@ -22,7 +22,7 @@ input PostQueryInput {
     id: ID
     categoryName: String
     countryCode: String
-    followed: Boolean!
+    followed: Boolean
     feedId: ID
     offset: Int!
     limit: Int!
