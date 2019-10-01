@@ -7,6 +7,7 @@ import CountrySchema from './CountrySchema';
 import CommentSchema from './CommentSchema';
 import FeedSchema from './FeedSchema';
 import TypesSchema from './TypesSchema';
+import NotificationSchema from './NotificationSchema';
 
 export default [
   UserSchema,
@@ -18,4 +19,5 @@ export default [
   TypesSchema,
   TagSchema,
   PostSchema,
+  NotificationSchema,
 ];

@@ -30,6 +30,7 @@ import {
   deleteComment,
 } from './comments/CommentsResolvers';
 import { getPosts } from './posts/PostsResolvers';
+import { getNotifications } from './notifications/NotificationsResolvers';
 
 const parseType = (id) => {
   const [type] = id.split('/');
@@ -57,6 +58,7 @@ const resolvers = {
     user,
     getPosts,
     getReports,
+    getNotifications,
   },
   Mutation: {
     signup,

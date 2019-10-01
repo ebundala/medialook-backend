@@ -7,6 +7,7 @@ import FeedDataSource from '../models/Feeds';
 import ReportDataSource from '../models/Reports';
 import CommentsDatasource from '../models/Comments';
 import PostsDatasource from '../models/Posts';
+import NotificationsDatasource from '../models/Notifications';
 
 export default new ApolloServer({
   typeDefs,
@@ -23,5 +24,6 @@ export default new ApolloServer({
     reports: new ReportDataSource(),
     comments: new CommentsDatasource(),
     posts: new PostsDatasource(),
+    notifications: new NotificationsDatasource(),
   }),
 });
