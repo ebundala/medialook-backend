@@ -32,3 +32,6 @@ export const follow = (root, { input },
 
 export const like = (root, { input },
   { dataSources, user }, info) => dataSources.users.like(user, input);
+
+export const search = (root, { input },
+  { user, dataSources }, info) => dataSources.users.fullTextSearch(user, input);

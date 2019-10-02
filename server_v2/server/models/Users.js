@@ -361,6 +361,39 @@ export default class Users extends ArangoDataSource {
     }
     throw new Error('Invalid Operation');
   }
+
+  async fullTextSearch(user, { query, offset, limit }) {
+    if (!user) throw new Error('User is not logged in');
+    const q = aql`
+    FOR post IN contentView
+    SEARCH ANALYZER(
+    post.description IN TOKENS(${query}, 'text_en') OR
+    post.title IN TOKENS(${query}, 'text_en') OR
+    post.summary IN TOKENS(${query}, 'text_en') OR
+    post.username IN TOKENS(${query}, 'text_en') OR
+    post.displayName IN TOKENS(${query}, 'text_en') OR
+    post.email IN TOKENS(${query}, 'text_en') OR
+    post.bio IN TOKENS(${query}, 'text_en') OR
+    post.feedName IN TOKENS(${query}, 'text_en') OR
+    post.mediaName IN TOKENS(${query}, 'text_en') OR
+    post.link IN TOKENS(${query}, 'text_en')OR
+    post.feedUrl IN TOKENS(${query}, 'text_en') OR
+    post.url IN TOKENS(${query}, 'text_en')OR
+    post.categoryName IN TOKENS(${query}, 'text_en') OR
+    post.tagName IN TOKENS(${query}, 'text_en')OR
+    post.countryCode IN TOKENS(${query}, 'text_en') OR
+    post.isoCountryCode IN TOKENS(${query}, 'text_en')
+    , 'text_en')
+    SORT BM25(post) DESC
+    LIMIT ${offset},${limit}
+    LET publisher = (FOR publisher, e,p IN 1..1 INBOUND post Publish,Reported return publisher)[0]
+    RETURN {content:post,publisher}`;
+    return this.db.query(q).then((arr) => arr.all())
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Error occured while Searching');
+      });
+  }
 }
 
 

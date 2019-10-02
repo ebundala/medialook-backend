@@ -10,6 +10,7 @@ import {
   getUsers,
   follow,
   like,
+  search,
 } from './users/UsersResolvers';
 import
 {
@@ -59,6 +60,7 @@ const resolvers = {
     getPosts,
     getReports,
     getNotifications,
+    search,
   },
   Mutation: {
     signup,

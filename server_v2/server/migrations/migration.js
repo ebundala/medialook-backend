@@ -56,7 +56,7 @@ const importMedias = async () => {
     log(res);
   }
 };
-importMedias();
+// importMedias();
 
 const importCategories = async () => {
   const { result } = category;
@@ -72,7 +72,7 @@ const importCategories = async () => {
     log(res);
   }
 };
-importCategories();
+// importCategories();
 const importTags = async () => {
   const { result } = tags;
   const data = result.map((item) => {
@@ -87,7 +87,7 @@ const importTags = async () => {
     log(res);
   }
 };
-importTags();
+// importTags();
 const importCountries = async () => {
   const { result } = countries;
   const data = result.map((item) => {
@@ -124,7 +124,7 @@ const importCountries = async () => {
     log(res);
   }
 };
-importCountries();
+// importCountries();
 
 const importPosts = () => {
   const { result } = posts;
@@ -213,3 +213,32 @@ const importComments = () => {
     return {};
   });
 };
+
+const importSearchView = async () => {
+  const view = DB.arangoSearchView('contentView');
+
+  if (!(await view.exists())) {
+    const links = {
+      Users: {
+        includeAllFields: true,
+        analyzers: ['text_en'],
+      },
+      Posts: {
+        includeAllFields: true,
+        analyzers: ['text_en'],
+      },
+      Reports: {
+        includeAllFields: true,
+        analyzers: ['text_en'],
+      },
+      Feeds: {
+        includeAllFields: true,
+        analyzers: ['text_en'],
+      },
+    };
+    const res = await view.create({ links }).catch((e) => e);
+    log(res);
+  }
+};
+
+importSearchView();
