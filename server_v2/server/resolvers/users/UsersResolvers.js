@@ -35,3 +35,6 @@ export const like = (root, { input },
 
 export const search = (root, { input },
   { user, dataSources }, info) => dataSources.users.fullTextSearch(user, input);
+  
+export const username = (root, { username } ,
+  { dataSources }, info) => dataSources.users.checkUsernameAvailability(username);

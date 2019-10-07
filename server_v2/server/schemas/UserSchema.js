@@ -15,6 +15,7 @@ type User {
     email: String!
     emailVerified: String
     disabled: Boolean
+    isAdmin: Boolean
 }
 
 input SignUpInput{
@@ -65,11 +66,11 @@ type ActionPayload {
     node: Content 
     }
 type Mutation {
-    signup(input: SignUpInput!): User
+    signup(input: SignUpInput!): AuthPayload!
     signin(input: SignInInput!): AuthPayload!
     startSession(idToken: String!): AuthPayload!
     destroySession(sessionToken: String!): LogoutPayload!
-    linkIdProvider(input: LinkIdProviderInput): ProfilePayload!
+    linkIdProvider(input: LinkIdProviderInput!): ProfilePayload!
     updateProfile(input: ProfileUpdateInput!): ProfilePayload!
     follow(input: ActionInput!): ActionPayload!
     like(input:ActionInput!): ActionPayload!
@@ -88,8 +89,12 @@ input UserQueryInput{
     followed: Boolean
     followers: Boolean   
 }
+type UsernameAvailability{
+    available: Boolean!
+}
 type Query {
     getUsers(input: UserQueryInput):[User!]!
     user(input:UserQueryInput): User!
+    username(username:String!):UsernameAvailability!
 }
 `;

@@ -52,7 +52,7 @@ export default class Users extends ArangoDataSource {
             emailVerified: user.emailVerified,
             avator: user.photoURL,
             role: 1,
-          })).then(async (user) => {
+          },)).then(async (user) => {
             const setClaims = await this._setUserClaims(user);
             if (setClaims) {
               const session = await this.signInWithEmail({ email, password })
@@ -158,9 +158,8 @@ export default class Users extends ArangoDataSource {
     } else if (!username) {
       throw new Error('No username provided');
     } else {
-    // eslint-disable-next-line no-unused-vars
-      const [bearer, token] = idToken.split(' ');
-      return admin.auth().verifyIdToken(token, true)
+    
+      return admin.auth().verifyIdToken(idToken, true)
         .then(async (info) => {
           const {
             linked, role, _key, uid,
@@ -333,7 +332,29 @@ export default class Users extends ArangoDataSource {
     }
     throw new Error('Invalid Operation');
   }
-
+  async checkUsernameAvailability(username){
+    log(username)
+    let available = false;
+    if(!isAlphanumeric(username)|| !isLength(username,3)){
+     return { available }
+    }
+    available = await this.usersCol.firstExample({username})
+   .then((user)=>{
+     if(user&&user._key){
+       return false;
+     }
+     return true;
+   }).catch((e) => {
+      const { message } = e; 
+      if (message === "no match"){
+        log("no_match")
+        return true
+      }
+      return false;
+    });
+    
+    return { available };
+  }
   async like({ _id }, { to, type }) {
     if (!_id) throw Error('User is not logged in');
     const createdAt = (new Date()).toISOString();

@@ -11,6 +11,7 @@ import {
   follow,
   like,
   search,
+  username
 } from './users/UsersResolvers';
 import
 {
@@ -61,6 +62,7 @@ const resolvers = {
     getReports,
     getNotifications,
     search,
+    username,
   },
   Mutation: {
     signup,
