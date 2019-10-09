@@ -8,7 +8,7 @@ import { Database } from 'arangojs';
 import { dbConfig } from '../config/db';
 import feeds from './data/feeds.json';
 import reports from './data/report.json';
-import countries from './data/country.json';
+import countries from './data/countryFull.json';
 import tags from './data/tags.json';
 import category from './data/category.json';
 import posts from './data/posts.json';
@@ -124,7 +124,7 @@ const importCountries = async () => {
     log(res);
   }
 };
-// importCountries();
+ // importCountries();
 
 const importPosts = () => {
   const { result } = posts;
@@ -241,4 +241,4 @@ const importSearchView = async () => {
   }
 };
 
-importSearchView();
+// importSearchView();
