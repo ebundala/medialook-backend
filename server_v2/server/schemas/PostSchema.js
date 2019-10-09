@@ -10,6 +10,7 @@ type Post {
     updatedAt: String
     pubDate: String!
     summary: String
+    description: String
     title: String!
     image: Image
     enclosures: [Image]

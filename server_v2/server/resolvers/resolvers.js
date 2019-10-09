@@ -11,7 +11,10 @@ import {
   follow,
   like,
   search,
-  username
+  username,
+  categories,
+  countries,
+  tags,
 } from './users/UsersResolvers';
 import
 {
@@ -63,6 +66,9 @@ const resolvers = {
     getNotifications,
     search,
     username,
+    categories,
+    countries,
+    tags,
   },
   Mutation: {
     signup,

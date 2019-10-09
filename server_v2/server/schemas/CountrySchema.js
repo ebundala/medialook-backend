@@ -16,4 +16,8 @@ type Country {
     abbrev: String
     flag: String
 }
+
+extend type Query{
+    countries:[Country]
+}
 `;

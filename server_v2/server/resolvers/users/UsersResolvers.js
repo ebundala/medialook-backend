@@ -14,7 +14,6 @@ export const signup = (root, { input },
 export const startSession = (root, { idToken },
   { dataSources }, info) => dataSources.users.createSessionToken(idToken);
 
-
 export const destroySession = (root, { sessionToken },
   { dataSources }, info) => dataSources.users.destroySessionToken(sessionToken);
 
@@ -38,3 +37,12 @@ export const search = (root, { input },
   
 export const username = (root, { username } ,
   { dataSources }, info) => dataSources.users.checkUsernameAvailability(username);
+
+export const categories = (root, args ,
+  { dataSources, user }, info) => dataSources.users.categories(user);
+  
+export const countries = (root, args,
+  { dataSources, user }, info) => dataSources.users.countries(user);
+
+export const tags = (root, args,
+  { dataSources, user }, info) => dataSources.users.tags(user);

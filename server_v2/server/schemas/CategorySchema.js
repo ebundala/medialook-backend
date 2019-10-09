@@ -10,4 +10,7 @@ type Category {
     categoryName: String!
     importance: Int!
 }
+extend type Query{
+    categories:[Category]
+}
 `;

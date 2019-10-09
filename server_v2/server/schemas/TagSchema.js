@@ -10,4 +10,7 @@ type Tag {
     tagName: String!
     importance: Int!
 }
+extend type Query{
+    tags:[Tag]
+}
 `;

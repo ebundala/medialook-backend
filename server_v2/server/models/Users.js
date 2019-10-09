@@ -415,6 +415,50 @@ export default class Users extends ArangoDataSource {
         throw new Error(message || 'Error occured while Searching');
       });
   }
+ categories(user){
+  if (!user) throw new Error('User is not logged in');
+  const query = aql`
+  FOR category IN Categories
+  SORT category.importance DESC
+  RETURN category
+  `;
+  return this.db.query(query).then((arr) => arr.all().then((val) => {
+    return val;
+  })).catch((e)=>{
+    const { message } = e;
+    throw new Error(message || 'Failed to get categories');
+  });
+ }
+ countries(user){
+  if (!user) throw new Error('User is not logged in');
+
+  const query = aql`
+  FOR val IN Countries
+  SORT val.admin ASC
+  RETURN val
+  `;
+  return this.db.query(query).then((arr) => arr.all().then((val) => {
+    return val;
+  })).catch((e)=>{
+    const { message } = e;
+    throw new Error(message || 'Failed to get Countries');
+  });
+ }
+ tags(user){
+  if (!user) throw new Error('User is not logged in');
+  const query = aql`
+  FOR val IN Tags
+  SORT val.importance DESC
+  RETURN val
+  `;
+  return this.db.query(query).then((arr) => arr.all().then((val) => {
+    log(val);
+    return val;
+  })).catch((e)=>{
+    const { message } = e;
+    throw new Error(message || 'Failed to get tags');
+  });
+ }
 }
 
 
