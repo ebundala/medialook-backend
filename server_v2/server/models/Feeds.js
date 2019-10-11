@@ -48,6 +48,8 @@ export default class Feeds extends ArangoDataSource {
   }
 
   async addFeed(user, { query, offset, limit }) {
+    if(!user) throw new Error('User is not loged in');
+    if(!query) throw new Error('No search term provided')
     const q = `%${query.toString().toLowerCase()}%`;
     const aq = aql`
                   FOR feed IN Feeds
