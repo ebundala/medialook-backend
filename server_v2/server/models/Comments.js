@@ -58,4 +58,22 @@ export default class Comments extends ArangoDatasource {
         throw new GraphQLError(message || 'Failed to delete a comment');
       });
   }
+
+  getComments(user, { _id, offset, limit }) {
+    if (!user) throw new GraphQLError('User is not loged in');
+    if (!_id || offset === undefined || limit === undefined) throw new GraphQLError('Invalid query missing required data');
+
+    const query = aql`
+    FOR author,e IN 1..1 INBOUND ${_id} Comment
+    SORT e.createdAt DESC
+    LIMIT ${offset},${limit}
+    RETURN {comment:e,author}
+    `;
+    return this.db.query(query)
+      .then((arr) => arr.all())
+      .catch((e) => {
+        const { message } = e;
+        throw new GraphQLError(message || 'Failed to get comments');
+      });
+  }
 }

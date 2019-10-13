@@ -16,6 +16,16 @@ type User {
     emailVerified: String
     disabled: Boolean
     isAdmin: Boolean
+    isFollowed: Boolean
+    isLiked: Boolean
+    isCommented: Boolean
+    isShared: Boolean
+    isViewed: Boolean
+    likesCount: Int
+    commentsCount: Int
+    followersCount: Int
+    followingsCount: Int
+    reportsCount: Int
 }
 
 input SignUpInput{

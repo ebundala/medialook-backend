@@ -15,6 +15,19 @@ type Feed {
     url: String!
     categoryName: String
     mediaName: String
+    isFollowed: Boolean
+    isLiked: Boolean
+    isCommented: Boolean
+    isShared: Boolean
+    isViewed: Boolean
+    likesCount: Int
+    commentsCount: Int
+    sharesCount: Int
+    viewsCount: Int
+    followersCount: Int
+    followingsCount: Int
+    postsCount: Int
+
 }
 input FeedInput {
     query: String!

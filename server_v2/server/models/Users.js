@@ -52,7 +52,7 @@ export default class Users extends ArangoDataSource {
             emailVerified: user.emailVerified,
             avator: user.photoURL,
             role: 1,
-          },)).then(async (user) => {
+          })).then(async (user) => {
             const setClaims = await this._setUserClaims(user);
             if (setClaims) {
               const session = await this.signInWithEmail({ email, password })
@@ -158,7 +158,6 @@ export default class Users extends ArangoDataSource {
     } else if (!username) {
       throw new Error('No username provided');
     } else {
-    
       return admin.auth().verifyIdToken(idToken, true)
         .then(async (info) => {
           const {
@@ -332,29 +331,31 @@ export default class Users extends ArangoDataSource {
     }
     throw new Error('Invalid Operation');
   }
-  async checkUsernameAvailability(username){
-    log(username)
+
+  async checkUsernameAvailability(username) {
+    log(username);
     let available = false;
-    if(!isAlphanumeric(username)|| !isLength(username,3)){
-     return { available }
+    if (!isAlphanumeric(username) || !isLength(username, 3)) {
+      return { available };
     }
-    available = await this.usersCol.firstExample({username})
-   .then((user)=>{
-     if(user&&user._key){
-       return false;
-     }
-     return true;
-   }).catch((e) => {
-      const { message } = e; 
-      if (message === "no match"){
-        log("no_match")
-        return true
-      }
-      return false;
-    });
-    
+    available = await this.usersCol.firstExample({ username })
+      .then((user) => {
+        if (user && user._key) {
+          return false;
+        }
+        return true;
+      }).catch((e) => {
+        const { message } = e;
+        if (message === 'no match') {
+          log('no_match');
+          return true;
+        }
+        return false;
+      });
+
     return { available };
   }
+
   async like({ _id }, { to, type }) {
     if (!_id) throw Error('User is not logged in');
     const createdAt = (new Date()).toISOString();
@@ -415,50 +416,49 @@ export default class Users extends ArangoDataSource {
         throw new Error(message || 'Error occured while Searching');
       });
   }
- categories(user){
-  if (!user) throw new Error('User is not logged in');
-  const query = aql`
+
+  categories(user) {
+    if (!user) throw new Error('User is not logged in');
+    const query = aql`
   FOR category IN Categories
   SORT category.importance DESC
   RETURN category
   `;
-  return this.db.query(query).then((arr) => arr.all().then((val) => {
-    return val;
-  })).catch((e)=>{
-    const { message } = e;
-    throw new Error(message || 'Failed to get categories');
-  });
- }
- countries(user){
-  if (!user) throw new Error('User is not logged in');
+    return this.db.query(query).then((arr) => arr.all().then((val) => val)).catch((e) => {
+      const { message } = e;
+      throw new Error(message || 'Failed to get categories');
+    });
+  }
 
-  const query = aql`
+  countries(user) {
+    if (!user) throw new Error('User is not logged in');
+
+    const query = aql`
   FOR val IN Countries
   SORT val.admin ASC
   RETURN val
   `;
-  return this.db.query(query).then((arr) => arr.all().then((val) => {
-    return val;
-  })).catch((e)=>{
-    const { message } = e;
-    throw new Error(message || 'Failed to get Countries');
-  });
- }
- tags(user){
-  if (!user) throw new Error('User is not logged in');
-  const query = aql`
+    return this.db.query(query).then((arr) => arr.all().then((val) => val)).catch((e) => {
+      const { message } = e;
+      throw new Error(message || 'Failed to get Countries');
+    });
+  }
+
+  tags(user) {
+    if (!user) throw new Error('User is not logged in');
+    const query = aql`
   FOR val IN Tags
   SORT val.importance DESC
   RETURN val
   `;
-  return this.db.query(query).then((arr) => arr.all().then((val) => {
-    log(val);
-    return val;
-  })).catch((e)=>{
-    const { message } = e;
-    throw new Error(message || 'Failed to get tags');
-  });
- }
+    return this.db.query(query).then((arr) => arr.all().then((val) => {
+      log(val);
+      return val;
+    })).catch((e) => {
+      const { message } = e;
+      throw new Error(message || 'Failed to get tags');
+    });
+  }
 }
 
 

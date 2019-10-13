@@ -18,6 +18,14 @@ type Post {
     link: String!
     guid: String
     feed: Feed
+    isLiked: Boolean
+    isCommented: Boolean
+    isShared: Boolean
+    isViewed: Boolean
+    likesCount: Int
+    commentsCount: Int
+    sharesCount: Int
+    viewsCount: Int
 }
 input PostQueryInput {
     id: ID

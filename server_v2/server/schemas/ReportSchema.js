@@ -21,6 +21,14 @@ type Report {
     text: String!
     tagName: String
     author: User
+    isLiked: Boolean
+    isCommented: Boolean
+    isShared: Boolean
+    isViewed: Boolean
+    likesCount: Int
+    commentsCount: Int
+    sharesCount: Int
+    viewsCount: Int
 }
 
 input ImageInput{

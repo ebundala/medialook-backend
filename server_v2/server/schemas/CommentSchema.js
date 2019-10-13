@@ -24,10 +24,21 @@ type Comment {
     commentText: String!
     createdAt: String
 }
-
+input CommentQuery{
+    _id: ID!    
+    offset: Int 
+    limit: Int
+}
+type CommentResult{
+    comment: Comment
+    author: User
+}
 extend type Mutation {
     comment(input: CommentInput!): CommentPayload
     editComment(input:CommentEditInput!):CommentPayload
     deleteComment(input:DeleteInput):DeletePayload
+}
+extend type Query{
+    getComments(input:CommentQuery!):[CommentResult]
 }
 `;

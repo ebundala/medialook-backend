@@ -8,3 +8,6 @@ export const editComment = (root, { input },
 
 export const deleteComment = (root, { input },
   { dataSources, user }, info) => dataSources.comments.deleteComment(user, input);
+
+export const getComments = (root, { input },
+  { dataSources, user }, info) => dataSources.comments.getComments(user, input);
