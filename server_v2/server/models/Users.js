@@ -404,8 +404,15 @@ export default class Users extends ArangoDataSource {
     post.categoryName IN TOKENS(${query}, 'text_en') OR
     post.tagName IN TOKENS(${query}, 'text_en')OR
     post.countryCode IN TOKENS(${query}, 'text_en') OR
-    post.isoCountryCode IN TOKENS(${query}, 'text_en')
-    , 'text_en')
+    post.isoCountryCode IN TOKENS(${query}, 'text_en') OR
+    post.region IN TOKENS(${query}, 'text_en') OR
+    post.district IN TOKENS(${query}, 'text_en') OR
+    post.locality IN TOKENS(${query}, 'text_en') OR
+    post.subLocality IN TOKENS(${query}, 'text_en') OR
+    post.country IN TOKENS(${query}, 'text_en') OR
+    post.locationName IN TOKENS(${query}, 'text_en') OR
+    post.text IN TOKENS(${query}, 'text_en')
+    , 'text_en') 
     SORT BM25(post) DESC
     LIMIT ${offset},${limit}
     RETURN post`;
