@@ -15,6 +15,10 @@ import {
   categories,
   countries,
   tags,
+  followers,
+  followings,
+  usersRecommendations,
+  feedsRecommendations,
 } from './users/UsersResolvers';
 import
 {
@@ -71,6 +75,10 @@ const resolvers = {
     countries,
     tags,
     getComments,
+    followers,
+    followings,
+    usersRecommendations,
+    feedsRecommendations,
   },
   Mutation: {
     signup,
@@ -92,6 +100,10 @@ const resolvers = {
     like,
   },
   Content: {
+    // eslint-disable-next-line no-underscore-dangle
+    __resolveType(parent) { return parseType(parent._id); },
+  },
+  Profile: {
     // eslint-disable-next-line no-underscore-dangle
     __resolveType(parent) { return parseType(parent._id); },
   },

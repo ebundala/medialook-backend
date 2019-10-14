@@ -102,9 +102,18 @@ input UserQueryInput{
 type UsernameAvailability{
     available: Boolean!
 }
+input PageInput{
+    offset: Int!
+    limit: Int!
+}
+union Profile = User | Feed
 type Query {
     getUsers(input: UserQueryInput):[User!]!
     user(input:UserQueryInput): User!
     username(username:String!):UsernameAvailability!
+    followers(input: PageInput!): [User]
+    followings(input: PageInput!): [Profile]
+    usersRecommendations(input: PageInput!): [User]
+    feedsRecommendations(input: PageInput!): [Feed]
 }
 `;

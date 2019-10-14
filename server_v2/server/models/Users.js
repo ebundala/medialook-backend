@@ -226,7 +226,7 @@ export default class Users extends ArangoDataSource {
   async updateProfile(user, {
     username, avator, displayName, email, phoneNumber, cover,
   }) {
-    if (!user._id) throw Error('User is not logged in');
+    this.isLogedIn(user);
     const userData = {};
     let newUsername;
     if (username) {
@@ -299,7 +299,7 @@ export default class Users extends ArangoDataSource {
   }
 
   follow({ _id }, { to, type }) {
-    if (!_id) throw Error('User is not logged in');
+    this.isLogedIn(_id);
     const createdAt = (new Date()).toISOString();
     const q = aql`RETURN DOCUMENT(${to})`;
     if (type === 'DO') {
@@ -333,7 +333,7 @@ export default class Users extends ArangoDataSource {
   }
 
   async checkUsernameAvailability(username) {
-    log(username);
+    // log(username);
     let available = false;
     if (!isAlphanumeric(username) || !isLength(username, 3)) {
       return { available };
@@ -357,7 +357,7 @@ export default class Users extends ArangoDataSource {
   }
 
   async like({ _id }, { to, type }) {
-    if (!_id) throw Error('User is not logged in');
+    this.isLogedIn(_id);
     const createdAt = (new Date()).toISOString();
     const q = aql`RETURN DOCUMENT(${to})`;
 
@@ -385,7 +385,7 @@ export default class Users extends ArangoDataSource {
   }
 
   async fullTextSearch(user, { query, offset, limit }) {
-    if (!user) throw new Error('User is not logged in');
+    this.isLogedIn(user);
     const q = aql`
     FOR post IN contentView
     SEARCH ANALYZER(
@@ -418,7 +418,7 @@ export default class Users extends ArangoDataSource {
   }
 
   categories(user) {
-    if (!user) throw new Error('User is not logged in');
+    this.isLogedIn(user);
     const query = aql`
   FOR category IN Categories
   SORT category.importance DESC
@@ -431,8 +431,7 @@ export default class Users extends ArangoDataSource {
   }
 
   countries(user) {
-    if (!user) throw new Error('User is not logged in');
-
+    this.isLogedIn(user);
     const query = aql`
   FOR val IN Countries
   SORT val.admin ASC
@@ -445,19 +444,105 @@ export default class Users extends ArangoDataSource {
   }
 
   tags(user) {
-    if (!user) throw new Error('User is not logged in');
+    this.isLogedIn(user);
     const query = aql`
   FOR val IN Tags
   SORT val.importance DESC
   RETURN val
   `;
-    return this.db.query(query).then((arr) => arr.all().then((val) => {
-      log(val);
-      return val;
-    })).catch((e) => {
-      const { message } = e;
-      throw new Error(message || 'Failed to get tags');
-    });
+    return this.db.query(query).then((arr) => arr.all())
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to get tags');
+      });
+  }
+
+  isLogedIn(user) {
+    if (!user) throw new Error('User is not logged in');
+  }
+
+  followers({ _id }, { offset, limit }) {
+    this.isLogedIn(_id);
+    const query = aql`
+    FOR user IN 1..1 INBOUND ${_id} Follows
+    SORT user.username
+    LIMIT ${offset},${limit}
+    RETURN user
+    `;
+    return this.db.query(query).then((arr) => arr.all())
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to get followers');
+      });
+  }
+
+  followings({ _id }, { offset, limit }) {
+    this.isLogedIn(_id);
+    const query = aql`
+    FOR user IN 1..1 OUTBOUND ${_id} Follows
+    SORT user.username
+    LIMIT ${offset},${limit}
+    RETURN user
+    `;
+    return this.db.query(query).then((arr) => arr.all())
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to get followings');
+      });
+  }
+
+  usersRecommendations({ _id }, { offset, limit }) {
+    log(_id);
+    this.isLogedIn(_id);
+    // TODO just load users not followed for now later use interest based
+    const query = aql`
+    let followed = (
+      FOR friend IN 1..1 OUTBOUND ${_id} Follows
+      FILTER HAS(friend,"username")
+      RETURN friend
+    )
+    FOR user IN Users 
+    FILTER user NOT IN followed
+    SORT user._key
+    LIMIT ${offset},${limit}
+    RETURN user
+    `;
+    return this.db.query(query).then((arr) => arr.all()).then((res) => this.shuffleArray(res))
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to get users recommendations');
+      });
+  }
+
+  feedsRecommendations({ _id }, { offset, limit }) {
+    this.isLogedIn(_id);
+    const query = aql`
+    let followed = (
+      FOR friend IN 1..1 OUTBOUND ${_id} Follows
+      FILTER HAS(friend,"feedUrl")
+      RETURN friend
+    )
+    FOR feed IN Feeds 
+    FILTER feed NOT IN followed
+    SORT feed._key
+    LIMIT ${offset},${limit}
+    RETURN feed
+    `;
+    return this.db.query(query).then((arr) => arr.all()).then((res) => this.shuffleArray(res))
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to get feeds recommendations');
+      });
+  }
+
+  shuffleArray(array) {
+    // eslint-disable-next-line no-plusplus
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      // eslint-disable-next-line no-param-reassign
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }
 

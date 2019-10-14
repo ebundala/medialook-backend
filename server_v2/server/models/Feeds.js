@@ -48,8 +48,8 @@ export default class Feeds extends ArangoDataSource {
   }
 
   async addFeed(user, { query, offset, limit }) {
-    if(!user) throw new Error('User is not loged in');
-    if(!query) throw new Error('No search term provided')
+    if (!user) throw new Error('User is not loged in');
+    if (!query) throw new Error('No search term provided');
     const q = `%${query.toString().toLowerCase()}%`;
     const aq = aql`
                   FOR feed IN Feeds
@@ -202,10 +202,28 @@ export default class Feeds extends ArangoDataSource {
 
   async deleteFeed({ isAdmin }, { _id }) {
     if (!isAdmin) throw new Error('User has no permission to delete a feed');
-    const res = await this.feedCol.remove(_id).catch((e) => {
-      const { message } = e;
-      throw new Error(message || 'Failed to delete feed');
-    });
-    return { message: 'Feed deleted successfully', _id };
+    if (!await this.feedCol.documentExists(_id)) throw new Error('Feed doesnt exist');
+
+    const query = aql`
+    LET posts = (FOR post IN 1..1 OUTBOUND ${_id} Publish  return post)
+    let publish = ( FOR author,e IN 1..1 OUTBOUND ${_id} Publish  return e)
+    let comments = (FOR post IN posts FOR author,e IN 1..1 INBOUND post Comment  return e)
+   let likes = (FOR post IN posts FOR author,e IN 1..1 INBOUND post \`Like\` return e)
+   let follows = ( FOR author,e IN 1..1 INBOUND ${_id} Follows  return e)
+   let pd=( FOR p IN posts REMOVE p IN Posts )
+   let cm = (FOR d IN comments REMOVE d IN Comment )
+   let pb = (FOR d IN publish REMOVE d IN Publish )
+   let lk = (FOR d IN likes REMOVE d IN \`Like\` )
+   let fl = (FOR d IN follows REMOVE d IN Follows)
+   FOR feed IN Feeds
+   FILTER feed._id == ${_id}
+   REMOVE feed IN Feeds Return feed._id
+    `;
+    return this.db.query(query).then((arr) => arr.next())
+      .then((id) => ({ message: 'Feed deleted successfully', _id: id }))
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to delete feed');
+      });
   }
 }

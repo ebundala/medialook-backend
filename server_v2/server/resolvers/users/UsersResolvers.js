@@ -34,15 +34,29 @@ export const like = (root, { input },
 
 export const search = (root, { input },
   { user, dataSources }, info) => dataSources.users.fullTextSearch(user, input);
-  
-export const username = (root, { username } ,
+
+// eslint-disable-next-line no-shadow
+export const username = (root, { username },
   { dataSources }, info) => dataSources.users.checkUsernameAvailability(username);
 
-export const categories = (root, args ,
+export const categories = (root, args,
   { dataSources, user }, info) => dataSources.users.categories(user);
-  
+
 export const countries = (root, args,
   { dataSources, user }, info) => dataSources.users.countries(user);
 
 export const tags = (root, args,
   { dataSources, user }, info) => dataSources.users.tags(user);
+
+
+export const followers = (root, { input },
+  { dataSources, user }, info) => dataSources.users.followers(user, input);
+
+export const followings = (root, { input },
+  { dataSources, user }, info) => dataSources.users.followings(user, input);
+
+export const usersRecommendations = (root, { input },
+  { dataSources, user }, info) => dataSources.users.usersRecommendations(user, input);
+
+export const feedsRecommendations = (root, { input },
+  { dataSources, user }, info) => dataSources.users.feedsRecommendations(user, input);

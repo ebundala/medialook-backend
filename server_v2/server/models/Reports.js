@@ -100,11 +100,23 @@ export default class Reports extends ArangoDataSource {
   async deleteReport(user, { _id }) {
     if (!user) throw new GraphQLError('User is not loged in');
     if (!await this.reportCol.documentExists(_id)) throw new GraphQLError('Report doesnt exist');
-    await this.reportCol.remove(_id).catch((e) => {
-      const { message } = e;
-      throw new GraphQLError(message || 'Failed to delete the report');
-    });
-    return { message: 'Report deleted succssesfully', _id };
+    const query = aql`
+    let reported = ( FOR author,e IN 1..1 INBOUND ${_id} Reported return e)
+    let comments = (FOR author,e IN 1..1 INBOUND ${_id} Comment return e)
+    let likes = (FOR author,e IN 1..1 INBOUND ${_id} \`Like\` return e)
+    let cm = (FOR d IN comments REMOVE d IN Comment)
+    let pb = (FOR d IN reported REMOVE d IN Reported)
+    let lk = (FOR d IN likes REMOVE d IN \`Like\`)
+    FOR report IN Reports
+    FILTER report._id == ${_id}
+    REMOVE report IN Reports Return report._id
+    `;
+    return this.db.query(query).then((arr) => arr.next())
+      .then((id) => ({ message: 'Report deleted succssesfully', _id: id }))
+      .catch((e) => {
+        const { message } = e;
+        throw new GraphQLError(message || 'Failed to delete the report');
+      });
   }
 
   // eslint-disable-next-line class-methods-use-this
