@@ -137,6 +137,7 @@ const resolvers = {
     followersCount: ({ _id }, args, { dataloaders }) => dataloaders.followersCount.load(_id),
     followingsCount: ({ _id }, args, { dataloaders }) => dataloaders.followingsCount.load(_id),
     postsCount: ({ _id }, args, { dataloaders }) => dataloaders.postsCount.load(_id),
+    author: ({ _id }, args, { dataloaders }) => dataloaders.author.load(_id),
 
   },
   Post: {
@@ -146,7 +147,7 @@ const resolvers = {
     // isViewed: ({ _id }, args, { dataloaders }) => dataloaders.isViewed.load(_id),
     likesCount: ({ _id }, args, { dataloaders }) => dataloaders.likesCount.load(_id),
     commentsCount: ({ _id }, args, { dataloaders }) => dataloaders.commentsCount.load(_id),
-
+    feed: ({ _id }, args, { dataloaders }) => dataloaders.feed.load(_id),
   },
   Report: {
     isLiked: ({ _id }, args, { dataloaders }) => dataloaders.isLiked.load(_id),

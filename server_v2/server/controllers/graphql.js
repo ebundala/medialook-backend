@@ -17,6 +17,8 @@ import followersCountLoader from '../dataloaders/followersCountLoader';
 import isLikedLoader from '../dataloaders/isLikedLoader';
 import isFollowedLoader from '../dataloaders/isFollowedLoader';
 import isCommentedLoader from '../dataloaders/isCommentedLoader';
+import authorLoader from '../dataloaders/authorLoader';
+import feedLoader from '../dataloaders/feedLoader';
 
 export default new ApolloServer({
   typeDefs,
@@ -35,6 +37,8 @@ export default new ApolloServer({
         isLiked: isLikedLoader(user),
         isFollowed: isFollowedLoader(user),
         isCommented: isCommentedLoader(user),
+        author: authorLoader(),
+        feed: feedLoader(),
 
       },
     };

@@ -27,6 +27,7 @@ type Feed {
     followersCount: Int
     followingsCount: Int
     postsCount: Int
+    author: User
 
 }
 input FeedInput {

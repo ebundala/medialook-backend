@@ -8,7 +8,7 @@ export default ({ _id }) => {
     const query = aql`
         let items= (FOR item IN 1..1 OUTBOUND ${_id} Follows return item)
         FOR item IN ${ids}
-        let followed = item IN items[*]._id
+        let followed = DOCUMENT(item) IN items
         RETURN ZIP([item],[followed])`;
 
     return DB.query(query).then((arr) => arr.all())

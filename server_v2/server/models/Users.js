@@ -408,8 +408,10 @@ export default class Users extends ArangoDataSource {
     , 'text_en')
     SORT BM25(post) DESC
     LIMIT ${offset},${limit}
-    LET publisher = (FOR publisher, e,p IN 1..1 INBOUND post Publish,Reported return publisher)[0]
-    RETURN {content:post,publisher}`;
+    RETURN post`;
+    /* LET publisher = (FOR publisher, e,p IN 1..1 INBOUND post
+      Publish,Reported return publisher)[0] */
+
     return this.db.query(q).then((arr) => arr.all())
       .catch((e) => {
         const { message } = e;

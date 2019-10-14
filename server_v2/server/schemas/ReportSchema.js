@@ -15,7 +15,7 @@ type Report {
     subLocality: String
     isoCountryCode: String
     locationName: String
-    enclosures: [Image!]
+    enclosures: [Image]
     district: String
     region: String
     text: String!
