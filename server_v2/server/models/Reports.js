@@ -155,9 +155,10 @@ export default class Reports extends ArangoDataSource {
       uniqueVertices: 'global',
       uniqueEdges: 'path'
       }
+      FILTER HAS(report,'text')
       `);
-      if (isoCountryCode || tagName) q.push(aql`FILTER`);
       if (isoCountryCode) {
+        q.push(aql`AND`);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
       if (tagName) {
@@ -177,6 +178,7 @@ export default class Reports extends ArangoDataSource {
             uniqueVertices: 'global',
             uniqueEdges: 'path'
             }
+        FILTER HAS(friend,"username")    
         RETURN friend)
         FOR user IN Users 
         FILTER user NOT IN friends
@@ -186,13 +188,14 @@ export default class Reports extends ArangoDataSource {
           uniqueVertices: 'global',
           uniqueEdges: 'path'
           }
+          FILTER HAS(report,'text')
        `);
-      if (isoCountryCode || tagName) q.push(aql`FILTER`);
       if (isoCountryCode) {
+        q.push(aql`AND`);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
       if (tagName) {
-        if (q.length > 2) q.push(aql`AND`);
+        q.push(aql`AND`);
         q.push(aql`report.tagName == ${tagName}`);
       }
       q.push(aql`
@@ -202,6 +205,9 @@ export default class Reports extends ArangoDataSource {
       query = aql.join(q);
     }
 
-    return this.db.query(query).then((arr) => arr.all());
+    return this.db.query(query).then((arr) => arr.all()).catch((e) => {
+      const { message } = e;
+      throw new GraphQLError(message || 'Failed to get report');
+    });
   }
 }

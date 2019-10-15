@@ -39,13 +39,15 @@ export default class Posts extends ArangoDataSource {
         uniqueVertices: 'global',
         uniqueEdges: 'path'
         }
+        FILTER HAS(post,"title")
         `);
-      if (categoryName || countryCode) q.push(aql`FILTER`);
-      if (categoryName) q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
+      if (categoryName) {
+        q.push(aql`AND`);
+        q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
+      }
       if (countryCode) {
-        let and = '';
-        if (categoryName) and = aql.literal('AND');
-        q.push(aql`${and} p.vertices[1].countryCode == ${countryCode}`);
+        q.push(aql`AND`);
+        q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
       q.push(aql`
       SORT post.pubDate DESC
@@ -71,13 +73,16 @@ export default class Posts extends ArangoDataSource {
         uniqueVertices: 'global',
         uniqueEdges: 'path'
         }   
+        FILTER HAS(post,"title")
       `);
 
-      if (categoryName || countryCode) q.push(aql`FILTER`);
-      if (categoryName) q.push(aql`p.vertices[0].categoryName == ${categoryName}`);
+      if (categoryName) {
+        q.push(aql`AND`);
+        q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
+      }
       if (countryCode) {
-        if (categoryName) q.push(aql.literal('AND'));
-        q.push(aql`p.vertices[0].countryCode == ${countryCode}`);
+        q.push(aql`AND`);
+        q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
       q.push(aql` 
       SORT post.pubDate DESC
