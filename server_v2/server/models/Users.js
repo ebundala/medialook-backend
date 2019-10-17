@@ -4,7 +4,7 @@ import { log } from 'console';
 import { aql } from 'arangojs';
 import { isEmail, isLength, isAlphanumeric } from 'validator';
 import { https } from 'request-easy';
-import admin from './admin';
+import admin, { uploadFile } from './admin';
 import env from '../config/config';
 import DB from '../config/db';
 import ArangoDataSource from './arangoDatasource/arangoDatasource';
@@ -223,37 +223,73 @@ export default class Users extends ArangoDataSource {
     }
   }
 
-  async updateProfile(user, {
-    username, avator, displayName, email, phoneNumber, cover,
-  }) {
+  async updateProfile(user, profile, avatorFile, coverFile) {
     this.isLogedIn(user);
     const userData = {};
+
+
+    if (avatorFile) {
+      const {
+        createReadStream, filename, mimetype,
+      } = await avatorFile;
+      const stream = createReadStream();
+      const fileUrl = await uploadFile(user._id, `profile/${user._id}/avator/${filename}`, mimetype, stream)
+        .catch((e) => {
+          const { message } = e;
+          throw new Error(message || 'Failed to upload file');
+        });
+      if (!fileUrl) throw new Error('Failed to upload file');
+      log(fileUrl);
+      userData.photoURL = fileUrl;
+    }
+    // todo handle cover file
+    if (coverFile) {
+      const {
+        createReadStream, filename, mimetype,
+      } = await coverFile;
+      const stream2 = createReadStream();
+      const fileUrl2 = await uploadFile(user._id, `profile/${user._id}/cover/${filename}`, mimetype, stream2)
+        .catch((e) => {
+          const { message } = e;
+          throw new Error(message || 'Failed to upload file');
+        });
+      if (!fileUrl2) throw new Error('Failed to upload file');
+      userData.cover = fileUrl2;
+    }
     let newUsername;
-    if (username) {
-      const exist = await this.usersCol.firstExample({ username }).catch((e) => e);
-      if (!(exist instanceof Error)) {
-        if (exist._key !== user._key) {
-          throw new Error('Username already in use with another account');
+    if (profile) {
+      const {
+        username, avator, displayName, email, phoneNumber, cover, bio,
+      } = profile;
+      if (username) {
+        const exist = await this.usersCol.firstExample({ username }).catch((e) => e);
+        if (!(exist instanceof Error)) {
+          if (exist._key !== user._key) {
+            throw new Error('Username already in use with another account');
+          }
+        }
+        newUsername = username;
+        if (!isAlphanumeric(newUsername) || !isLength(newUsername, 3)) {
+          throw new Error('Username must be 3 characters or more and not contain special characters');
         }
       }
+      // const oldInfo = await this.usersCol.document(_id).catch((e) => e);
+      // if (oldInfo instanceof Error) throw oldInfo;
+      // eslint-disable-next-line prefer-const
+
+      if (bio) userData.bio = bio;
+      if (avator) userData.photoURL = avator;
+      if (displayName && isLength(displayName, 2)) userData.displayName = displayName;
+      if (email) userData.email = email;
+      if (phoneNumber) userData.phoneNumber = phoneNumber;
+      userData.cover = cover || userData.cover || user.cover;
     }
-    // const oldInfo = await this.usersCol.document(_id).catch((e) => e);
-    // if (oldInfo instanceof Error) throw oldInfo;
-    // eslint-disable-next-line prefer-const
-    newUsername = username || user.username;
-    if (!isAlphanumeric(newUsername) || !isLength(newUsername, 3)) {
-      throw new Error('Username must be 3 characters or more and not contain special characters');
-    }
-    if (avator) userData.photoURL = avator;
-    if (displayName) userData.displayName = displayName;
-    if (email) userData.email = email;
-    if (phoneNumber) userData.phoneNumber = phoneNumber;
     const fuser = await admin.auth().updateUser(user._key, userData).catch((e) => e);
     if (fuser instanceof Error) {
       const { message } = fuser;
       throw new Error(message || 'Failed to update firebase user');
     }
-    userData.cover = cover || user.cover;
+    newUsername = newUsername || user.username;
     const data = {
       username: newUsername,
       email: fuser.email,
@@ -264,6 +300,7 @@ export default class Users extends ArangoDataSource {
       emailVerified: fuser.emailVerified,
       cover: userData.cover,
     };
+    if (userData.bio) data.bio = userData.bio;
     const auser = await this.usersCol.update(user._id, data)
       .then(() => this.usersCol.document(user._id)).catch((e) => e);
     if (auser instanceof Error) {
@@ -272,11 +309,18 @@ export default class Users extends ArangoDataSource {
     return { user: auser, message: 'Profile updated successfully' };
   }
 
-  getUserByExample(args) {
-    return this.usersCol.firstExample(args).catch(() => { throw new Error('Not found'); });
+  getUserByExample(user, args) {
+    this.isLogedIn(user);
+    let example = args;
+    if (args.me) {
+      example = { _id: user._id };
+    }
+
+    return this.usersCol.firstExample(example).catch(() => { throw new Error('Not found'); });
   }
 
-  getUsersByExample(args) {
+  getUsersByExample(user, args) {
+    this.isLogedIn(user);
     if (args) {
       return this.usersCol.byExample(args).then((arr) => arr.all())
         .catch(() => { throw new Error('Not found'); });
@@ -505,11 +549,11 @@ export default class Users extends ArangoDataSource {
     this.isLogedIn(_id);
     // TODO just load users not followed for now later use interest based
     const query = aql`
-    let followed = (
+    let followed = UNION((
       FOR friend IN 1..1 OUTBOUND ${_id} Follows
       FILTER HAS(friend,"username")
       RETURN friend
-    )
+    ),[DOCUMENT(${_id})])
     FOR user IN Users 
     FILTER user NOT IN followed
     SORT user._key

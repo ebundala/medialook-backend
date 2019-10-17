@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 // import { log } from 'console';
-// import { aql } from 'arangojs';
 import { GraphQLError } from 'graphql';
 import { aql } from 'arangojs';
 import DB from '../config/db';
+import { uploadFile } from './admin';
 import ArangoDataSource from './arangoDatasource/arangoDatasource';
 
 export default class Reports extends ArangoDataSource {
@@ -21,14 +22,28 @@ export default class Reports extends ArangoDataSource {
     subLocality,
     isoCountryCode,
     locationName,
-    enclosures,
+    // enclosures,
     district,
     region,
     text,
     tagName,
-  }) {
+  }, file) {
     if (!_id) throw new GraphQLError('User is not loged in');
+
+    if (!file) throw new Error('Missing media content');
+    const {
+      createReadStream, filename, mimetype,
+    } = await file;
+    const stream = createReadStream();
+    const fileUrl = await uploadFile(_id, `reports/${_id}${filename}`, mimetype, stream)
+      .catch((e) => {
+        const { message } = e;
+        throw new Error(message || 'Failed to upload file');
+      });
+    if (!fileUrl) throw new Error('Failed to upload file');
+
     const createdAt = (new Date()).toISOString();
+
     const report = await this.reportCol.save(
       {
         country,
@@ -39,7 +54,7 @@ export default class Reports extends ArangoDataSource {
         subLocality,
         isoCountryCode,
         locationName,
-        enclosures,
+        enclosures: [{ url: fileUrl, type: mimetype }],
         district,
         region,
         text,
@@ -133,7 +148,7 @@ export default class Reports extends ArangoDataSource {
     let query;
     if (!_id) throw new Error('User is not loged in');
     if (id) {
-      query = aql`FOR user,e,p IN 1..1 INBOUND ${id} Reported 
+      query = aql`FOR user,e,p IN 1..1 INBOUND ${id} Reported
       RETURN MERGE(p.vertices[0],{author:user})
       `;
     } else if (userId) {
@@ -149,7 +164,7 @@ export default class Reports extends ArangoDataSource {
       RETURN MERGE(report,{author:p.vertices[0]})`;
     } else if (followed) {
       q.push(aql`
-      FOR report,e,p IN 2..2 OUTBOUND ${_id} Follows, Reported
+      FOR report,e,p IN 1..2 OUTBOUND ${_id} Follows, Reported
       OPTIONS {
       bfs:true,
       uniqueVertices: 'global',
@@ -158,11 +173,11 @@ export default class Reports extends ArangoDataSource {
       FILTER HAS(report,'text')
       `);
       if (isoCountryCode) {
-        q.push(aql`AND`);
+        q.push(aql.literal` AND `);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
       if (tagName) {
-        if (q.length > 2) q.push(aql`AND`);
+        q.push(aql.literal` AND `);
         q.push(aql`report.tagName == ${tagName}`);
       }
       q.push(aql`
@@ -178,11 +193,11 @@ export default class Reports extends ArangoDataSource {
             uniqueVertices: 'global',
             uniqueEdges: 'path'
             }
-        FILTER HAS(friend,"username")    
+        FILTER HAS(friend,"username")
         RETURN friend)
-        FOR user IN Users 
+        FOR user IN Users
         FILTER user NOT IN friends
-        FOR report, e, p IN 1..1 OUTBOUND user Reported 
+        FOR report, e, p IN 1..1 OUTBOUND user Reported
         OPTIONS {
           bfs:true,
           uniqueVertices: 'global',
@@ -191,11 +206,11 @@ export default class Reports extends ArangoDataSource {
           FILTER HAS(report,'text')
        `);
       if (isoCountryCode) {
-        q.push(aql`AND`);
+        q.push(aql.literal`AND`);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
       if (tagName) {
-        q.push(aql`AND`);
+        q.push(aql.literal`AND`);
         q.push(aql`report.tagName == ${tagName}`);
       }
       q.push(aql`

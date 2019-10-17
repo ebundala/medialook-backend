@@ -20,11 +20,12 @@ export const destroySession = (root, { sessionToken },
 export const linkIdProvider = (root, { input },
   { dataSources }, info) => dataSources.users.linkIdProvider(input);
 
-export const updateProfile = (root, { input },
-  { dataSources, user }, info) => dataSources.users.updateProfile(user, input);
+export const updateProfile = (root, { input, avatorFile, coverFile },
+  { dataSources, user }, info) => dataSources.users.updateProfile(user, input,
+  avatorFile, coverFile);
 
 export const getUser = (root, { input },
-  { dataSources }, info) => dataSources.users.getUserByExample(input);
+  { dataSources, user }, info) => dataSources.users.getUserByExample(user, input);
 
 export const follow = (root, { input },
   { dataSources, user }, info) => dataSources.users.follow(user, input);

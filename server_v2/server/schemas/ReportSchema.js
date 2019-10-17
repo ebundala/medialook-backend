@@ -48,13 +48,13 @@ input ReportInput {
     subLocality: String
     isoCountryCode: String
     locationName: String
-    enclosures: [ImageInput!]
+    enclosures: [ImageInput]
     district: String
     region: String
     text: String!
     tagName: String!
 }
-
+ 
  input ReportEditInput{
      _id: ID!
     country: String
@@ -86,11 +86,23 @@ type ReportPayload {
     message: String!
     report: Report!
 }
+enum FileUploadType{
+    COVER
+    AVATOR
+    ENCLOSURE
+}
+type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+    record(type:FileUploadType):Content
+  }
 
 extend type Mutation {
-    createReport(input: ReportInput!): ReportPayload   
+    createReport(input: ReportInput!,file: Upload!): ReportPayload   
     editReport(input: ReportEditInput!): ReportPayload
     deleteReport(input: DeleteInput!): DeletePayload
+    singleUpload(file:Upload!):File!
 }
 
 extend type Query{

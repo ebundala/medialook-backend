@@ -12,6 +12,7 @@ type User {
     phoneNumber: String
     cover: String
     avator: String
+    bio: String
     email: String!
     emailVerified: String
     disabled: Boolean
@@ -48,7 +49,8 @@ input ProfileUpdateInput{
     email: String
     avator: String
     cover: String
-    phoneNumber: String!
+    bio: String
+    phoneNumber: String
 }
 enum ActionType{
     DO
@@ -81,7 +83,7 @@ type Mutation {
     startSession(idToken: String!): AuthPayload!
     destroySession(sessionToken: String!): LogoutPayload!
     linkIdProvider(input: LinkIdProviderInput!): ProfilePayload!
-    updateProfile(input: ProfileUpdateInput!): ProfilePayload!
+    updateProfile(input: ProfileUpdateInput, avatorFile: Upload, coverFile: Upload): ProfilePayload!
     follow(input: ActionInput!): ActionPayload!
     like(input:ActionInput!): ActionPayload!
        
@@ -95,9 +97,7 @@ input UserQueryInput{
     disabled: Boolean
     emailVerified: Boolean
     displayName: String
-    #todo impliment the logic for followes
-    followed: Boolean
-    followers: Boolean   
+    me: Boolean 
 }
 type UsernameAvailability{
     available: Boolean!
