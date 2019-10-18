@@ -32,7 +32,8 @@ export default class Posts extends ArangoDataSource {
         LIMIT ${offset},${limit}
         RETURN MERGE(post,{feed:p.vertices[0]})
     `;
-    } else if (followed) {
+    } else if (followed === true) {
+      console.log("followed ",followed)
       q.push(aql`FOR post,e,p IN 2..2 OUTBOUND ${_id} Follows, Publish 
         OPTIONS {
         bfs:true,
@@ -54,7 +55,8 @@ export default class Posts extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(post,{feed:p.vertices[1]})`);
       query = aql.join(q);
-    } else {
+    } else if(followed === false) {
+      console.log("followed ",followed)
       q.push(aql`
       LET myFeeds = (FOR feed IN 1..1 OUTBOUND 
         ${_id} Follows
@@ -84,6 +86,32 @@ export default class Posts extends ArangoDataSource {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
+      q.push(aql` 
+      SORT post.pubDate DESC
+      LIMIT ${offset},${limit}
+      RETURN MERGE(post,{feed:p.vertices[0]})`);
+      query = aql.join(q);
+    }
+    else{
+      console.log("reached not followed or followed")
+      q.push(aql`FOR feed IN Feeds FILTER HAS(feed,"feedUrl")`)
+      if (categoryName) {
+        q.push(aql`AND`);
+        q.push(aql`feed.categoryName == ${categoryName}`);
+      }
+      if (countryCode) {
+        q.push(aql`AND`);
+        q.push(aql`feed.countryCode == ${countryCode}`);
+      }
+      q.push(aql`        
+        FOR post,e,p IN 1..1 OUTBOUND feed Publish 
+        OPTIONS {
+        bfs:true,
+        uniqueVertices: 'global',
+        uniqueEdges: 'path'
+        }   
+        FILTER HAS(post,"title")
+      `);
       q.push(aql` 
       SORT post.pubDate DESC
       LIMIT ${offset},${limit}

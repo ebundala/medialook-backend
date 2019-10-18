@@ -162,7 +162,7 @@ export default class Reports extends ArangoDataSource {
       SORT report.createdAt DESC
       LIMIT ${offset},${limit}
       RETURN MERGE(report,{author:p.vertices[0]})`;
-    } else if (followed) {
+    } else if (followed===true) {
       q.push(aql`
       FOR report,e,p IN 1..2 OUTBOUND ${_id} Follows, Reported
       OPTIONS {
@@ -185,7 +185,7 @@ export default class Reports extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(report,{author:p.vertices[1]})`);
       query = aql.join(q);
-    } else {
+    } else if (followed === false) {
       q.push(aql`
         LET friends = (FOR friend IN 1..1 OUTBOUND ${_id} Follows
           OPTIONS {
@@ -217,6 +217,31 @@ export default class Reports extends ArangoDataSource {
        SORT report.createdAt DESC
        LIMIT ${offset},${limit}
        RETURN MERGE(report,{author:p.vertices[0]})`);
+      query = aql.join(q);
+    }
+    else{
+      q.push(aql`
+      FOR user IN Users
+      FOR report,e,p IN 1..1 OUTBOUND user Reported
+      OPTIONS {
+      bfs:true,
+      uniqueVertices: 'global',
+      uniqueEdges: 'path'
+      }
+      FILTER HAS(report,'text')
+      `);
+      if (isoCountryCode) {
+        q.push(aql.literal` AND `);
+        q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
+      }
+      if (tagName) {
+        q.push(aql.literal` AND `);
+        q.push(aql`report.tagName == ${tagName}`);
+      }
+      q.push(aql`
+      SORT report.createdAt DESC
+      LIMIT ${offset},${limit}
+      RETURN MERGE(report,{author:p.vertices[1]})`);
       query = aql.join(q);
     }
 

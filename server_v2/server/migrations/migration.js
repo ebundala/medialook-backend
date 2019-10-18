@@ -6,7 +6,7 @@ import '@babel/polyfill';
 import { log } from 'console';
 import { Database } from 'arangojs';
 import { dbConfig } from '../config/db';
-import feeds from './data/feeds.json';
+import feeds from './data/feedFull.json';
 import reports from './data/report.json';
 import countries from './data/countryFull.json';
 import tags from './data/tags.json';
@@ -56,7 +56,7 @@ const importMedias = async () => {
     log(res);
   }
 };
-// importMedias();
+importMedias();
 
 const importCategories = async () => {
   const { result } = category;

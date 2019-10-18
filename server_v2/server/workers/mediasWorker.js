@@ -4,6 +4,8 @@ import '@babel/polyfill';
 import FeedParser from 'davefeedread';
 import amqplib from 'amqplib';
 // import striptags from 'striptags';
+import Express from 'express';
+const app = Express();
 import {
   debug, error, time, timeEnd,
 } from 'console';
@@ -181,10 +183,28 @@ const startRefreshLoop = async () => {
   } else {
     error(feeds);
   }
-  setTimeout(() => {}, REFRESH_TIME_CYCLE);
+ // setTimeout(() => {}, REFRESH_TIME_CYCLE);
 };
 // run main tasks
 mediaQueueTask();
 mediaConsumerTask();
 postsProducerTask();
-startRefreshLoop();
+// startRefreshLoop();
+let runTask = false;
+
+setInterval(() => {
+  if(runTask){
+    runTask = false;
+    startRefreshLoop();
+  }
+}, 5000);
+
+app.get("/refresh",(req,res)=>{
+  runTask = true;
+  res.json({message:'ok'});
+})
+
+app.listen(5005,()=>{
+  debug("Media server listens on port 5005");
+})
+
