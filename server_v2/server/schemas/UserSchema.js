@@ -116,4 +116,17 @@ type Query {
     usersRecommendations(input: PageInput!): [User]
     feedsRecommendations(input: PageInput!): [Feed]
 }
+
+
+type SearchResult{
+    content: Content!
+}
+input SearchInput {
+    query: String!
+    offset: Int!
+    limit: Int!
+}
+extend type Query {
+    search(input: SearchInput!,type: String): [Content]
+}
 `;

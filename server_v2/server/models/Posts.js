@@ -55,8 +55,8 @@ export default class Posts extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(post,{feed:p.vertices[1]})`);
       query = aql.join(q);
-    } else if(followed === false) {
-      console.log("followed ",followed)
+    } else if (followed === false) {
+      
       q.push(aql`
       LET myFeeds = (FOR feed IN 1..1 OUTBOUND 
         ${_id} Follows

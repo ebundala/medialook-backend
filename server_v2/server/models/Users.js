@@ -94,7 +94,8 @@ export default class Users extends ArangoDataSource {
           const { idToken } = credential;
           const session = await this.createSessionToken(idToken).catch((e) => e);
           if (session instanceof Error) {
-            throw session;
+            const { message } = session;
+            throw new Error(message || 'Signin failed something went wrong');
           }
           return session;
           // this.collection.document(localId).then((user) => ({ user, sessionToken }));
@@ -428,9 +429,10 @@ export default class Users extends ArangoDataSource {
     throw new Error('Invalid Operation');
   }
 
-  async fullTextSearch(user, { query, offset, limit }) {
-    this.isLogedIn(user);
-    const q = aql`
+  async fullTextSearch({ _id }, { query, offset, limit }, type) {
+    this.isLogedIn(_id);
+    const q = [];
+    q.push(aql`
     FOR post IN contentView
     SEARCH ANALYZER(
     post.description IN TOKENS(${query}, 'text_en') OR
@@ -456,14 +458,19 @@ export default class Users extends ArangoDataSource {
     post.country IN TOKENS(${query}, 'text_en') OR
     post.locationName IN TOKENS(${query}, 'text_en') OR
     post.text IN TOKENS(${query}, 'text_en')
-    , 'text_en') 
-    SORT BM25(post) DESC
+    , 'text_en')`);
+    if (type) {
+      log(type);
+      q.push(aql`FILTER PARSE_IDENTIFIER(post).collection == ${type}`);
+    }
+    q.push(aql`SORT BM25(post) DESC
     LIMIT ${offset},${limit}
-    RETURN post`;
+    RETURN post`);
+    log(offset, limit, 'params');
     /* LET publisher = (FOR publisher, e,p IN 1..1 INBOUND post
       Publish,Reported return publisher)[0] */
-
-    return this.db.query(q).then((arr) => arr.all())
+    const qy = aql.join(q);
+    return this.db.query(qy).then((arr) => arr.all())
       .catch((e) => {
         const { message } = e;
         throw new Error(message || 'Error occured while Searching');

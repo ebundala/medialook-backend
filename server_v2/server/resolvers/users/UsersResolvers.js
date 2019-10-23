@@ -33,8 +33,8 @@ export const follow = (root, { input },
 export const like = (root, { input },
   { dataSources, user }, info) => dataSources.users.like(user, input);
 
-export const search = (root, { input },
-  { user, dataSources }, info) => dataSources.users.fullTextSearch(user, input);
+export const search = (root, { input, type },
+  { user, dataSources }, info) => dataSources.users.fullTextSearch(user, input, type);
 
 // eslint-disable-next-line no-shadow
 export const username = (root, { username },

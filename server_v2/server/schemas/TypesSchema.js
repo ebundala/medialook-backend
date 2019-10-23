@@ -18,15 +18,4 @@ type DeletePayload{
 # union Subject = Report | Post  
 union Content = User | Feed | Post | Report | Comment
 
-type SearchResult{
-    content: Content!
-}
-input SearchInput {
-    query: String!
-    offset: Int!
-    limit: Int!
-}
-extend type Query {
-    search(input: SearchInput!): [Content]
-}
 `;
