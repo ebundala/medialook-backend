@@ -39,7 +39,7 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.1"
+          cpus: "0.125"
           memory: 256MiB
       restart_policy:
         condition: on-failure
@@ -59,7 +59,7 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.05"
+          cpus: "0.125"
           memory: 256MiB
       restart_policy:
         condition: on-failure      
@@ -113,13 +113,13 @@ services:
     ports:
       - 3000:15672 # management
       - 3001:5672  # Amqp 
-      - 3002:1883  # ws
-      - 3003:8883  # tls ws
-      - 3004:15675 #mqtt ws
+      #- 3002:1883  # ws
+      #- 3003:8883  # tls ws
+      #- 3004:15675 #mqtt ws
     networks: 
       - webnet
-    volumes:
-      - ${PWD}/server_v2/server/config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    # volumes:
+      # - ${PWD}/server_v2/server/config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
       # - rabbitMq:/var/lib/rabbitmq
       #- ./storage/rabbitMq/mnesia:/var/lib/rabbitmq/mnesia
       #- ./storage/rabbitMq/schema:/var/lib/rabbitmq/schema
@@ -128,7 +128,7 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.3"
+          cpus: "0.15"
           memory: 512MiB
       restart_policy:
         condition: any
