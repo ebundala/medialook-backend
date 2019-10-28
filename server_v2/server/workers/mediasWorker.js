@@ -5,13 +5,14 @@ import FeedParser from 'davefeedread';
 import amqplib from 'amqplib';
 // import striptags from 'striptags';
 import Express from 'express';
-const app = Express();
 import {
   debug, error, time, timeEnd,
 } from 'console';
 import misc from '../config/misc';
 import DB from '../config/db';
 import RabbitMqSettings from '../config/rabbitMq';
+
+const app = Express();
 
 const {
   TIMEOUT_IN_SEC, MEDIA_QUEUE, POST_QUEUE, REFRESH_TIME_CYCLE,
@@ -90,7 +91,7 @@ const mediaQueueTask = (timeout = TIMEOUT_IN_SEC) => {
           timeEnd('queing media');
         });
       }
-    }, 250);
+    }, 1000);
   }).catch((e) => {
     clearInterval(timerHandle);
     error(e);
@@ -158,7 +159,7 @@ const postsProducerTask = (timeout = TIMEOUT_IN_SEC) => {
             ch.sendToQueue(POST_QUEUE, Buffer.from(JSON.stringify(msg)));
             // timeEnd("queing post")
           }
-        }, 250);
+        }, 500);
       })).catch((e) => {
       clearInterval(timerHandle);
       error(e);
@@ -183,7 +184,7 @@ const startRefreshLoop = async () => {
   } else {
     error(feeds);
   }
- // setTimeout(() => {}, REFRESH_TIME_CYCLE);
+  // setTimeout(() => {}, REFRESH_TIME_CYCLE);
 };
 // run main tasks
 mediaQueueTask();
@@ -193,18 +194,17 @@ postsProducerTask();
 let runTask = false;
 
 setInterval(() => {
-  if(runTask){
+  if (runTask) {
     runTask = false;
     startRefreshLoop();
   }
-}, 5000);
+}, 15000);
 
-app.get("/refresh",(req,res)=>{
+app.get('/refresh', (req, res) => {
   runTask = true;
-  res.json({message:'ok'});
-})
+  res.json({ message: 'ok' });
+});
 
-app.listen(5005,()=>{
-  debug("Media server listens on port 5005");
-})
-
+app.listen(5005, () => {
+  debug('Media server listens on port 5005');
+});

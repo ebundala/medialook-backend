@@ -3,7 +3,6 @@
  */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@babel/polyfill';
-// import FeedParser from 'davefeedread';
 import amqplib from 'amqplib';
 import striptags from 'striptags';
 import probe from 'probe-image-size';
@@ -21,6 +20,8 @@ import replaceHtml from './utils';
 const {
   TIMEOUT_IN_SEC, POST_QUEUE,
 } = misc;
+
+const queue = [];
 
 
 const savePostToDB = (data) => {
@@ -221,12 +222,8 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
       if (msg !== null) {
         const str = msg.content.toString();
         const msgObj = JSON.parse(str);
-        buildPost(msgObj).then((data) => savePostToDB(data)
-          .then(() => {
-            ch.ack(msg);
-          }).catch(() => {
-            ch.ack(msg);
-          }));
+        queue.push(msgObj);
+        ch.ack(msg);
       }
     }))).catch((e) => {
     error(e);
@@ -238,5 +235,14 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
 
 
 // run main task
-
+setInterval(() => {
+  if (queue.length) {
+    const post = queue.shift();
+    buildPost(post).then((data) => savePostToDB(data)
+      .catch((e) => {
+        const { message } = e;
+        error(message);
+      }));
+  }
+}, 250);
 postsConsumerTask();

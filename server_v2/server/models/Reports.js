@@ -88,7 +88,7 @@ export default class Reports extends ArangoDataSource {
     text,
     tagName,
   }) {
-    if (!user) throw new GraphQLError('User not loged in');
+    if (!user._id) throw new GraphQLError('User not loged in');
     const data = {};
     if (!_id || !(await this.reportCol.documentExists(_id))) { throw new Error('Requested report doesnt exist'); }
     if (country) data.country = country;
@@ -162,7 +162,7 @@ export default class Reports extends ArangoDataSource {
       SORT report.createdAt DESC
       LIMIT ${offset},${limit}
       RETURN MERGE(report,{author:p.vertices[0]})`;
-    } else if (followed===true) {
+    } else if (followed === true) {
       q.push(aql`
       FOR report,e,p IN 1..2 OUTBOUND ${_id} Follows, Reported
       OPTIONS {
@@ -172,7 +172,7 @@ export default class Reports extends ArangoDataSource {
       }
       FILTER HAS(report,'text')
       `);
-      if (isoCountryCode) {
+      if (isoCountryCode && isoCountryCode !== '🌎') {
         q.push(aql.literal` AND `);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
@@ -205,7 +205,7 @@ export default class Reports extends ArangoDataSource {
           }
           FILTER HAS(report,'text')
        `);
-      if (isoCountryCode) {
+      if (isoCountryCode && isoCountryCode !== '🌎') {
         q.push(aql.literal`AND`);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }
@@ -218,8 +218,7 @@ export default class Reports extends ArangoDataSource {
        LIMIT ${offset},${limit}
        RETURN MERGE(report,{author:p.vertices[0]})`);
       query = aql.join(q);
-    }
-    else{
+    } else {
       q.push(aql`
       FOR user IN Users
       FOR report,e,p IN 1..1 OUTBOUND user Reported
@@ -230,7 +229,7 @@ export default class Reports extends ArangoDataSource {
       }
       FILTER HAS(report,'text')
       `);
-      if (isoCountryCode) {
+      if (isoCountryCode && isoCountryCode !== '🌎') {
         q.push(aql.literal` AND `);
         q.push(aql`report.isoCountryCode == ${isoCountryCode}`);
       }

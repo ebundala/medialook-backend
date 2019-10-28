@@ -33,7 +33,6 @@ export default class Posts extends ArangoDataSource {
         RETURN MERGE(post,{feed:p.vertices[0]})
     `;
     } else if (followed === true) {
-      console.log("followed ",followed)
       q.push(aql`FOR post,e,p IN 2..2 OUTBOUND ${_id} Follows, Publish 
         OPTIONS {
         bfs:true,
@@ -42,11 +41,11 @@ export default class Posts extends ArangoDataSource {
         }
         FILTER HAS(post,"title")
         `);
-      if (categoryName) {
+      if (categoryName && categoryName !== 'Uncategorized') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
       }
-      if (countryCode) {
+      if (countryCode && countryCode !== '🌎') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
@@ -56,7 +55,6 @@ export default class Posts extends ArangoDataSource {
       RETURN MERGE(post,{feed:p.vertices[1]})`);
       query = aql.join(q);
     } else if (followed === false) {
-      
       q.push(aql`
       LET myFeeds = (FOR feed IN 1..1 OUTBOUND 
         ${_id} Follows
@@ -78,11 +76,11 @@ export default class Posts extends ArangoDataSource {
         FILTER HAS(post,"title")
       `);
 
-      if (categoryName) {
+      if (categoryName && categoryName !== 'Uncategorized') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
       }
-      if (countryCode) {
+      if (countryCode && countryCode !== '🌎') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
@@ -91,15 +89,13 @@ export default class Posts extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(post,{feed:p.vertices[0]})`);
       query = aql.join(q);
-    }
-    else{
-      console.log("reached not followed or followed")
-      q.push(aql`FOR feed IN Feeds FILTER HAS(feed,"feedUrl")`)
-      if (categoryName) {
+    } else {
+      q.push(aql`FOR feed IN Feeds FILTER HAS(feed,"feedUrl")`);
+      if (categoryName && categoryName !== 'Uncategorized') {
         q.push(aql`AND`);
         q.push(aql`feed.categoryName == ${categoryName}`);
       }
-      if (countryCode) {
+      if (countryCode && countryCode !== '🌎') {
         q.push(aql`AND`);
         q.push(aql`feed.countryCode == ${countryCode}`);
       }
