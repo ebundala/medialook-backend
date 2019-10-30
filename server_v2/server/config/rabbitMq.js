@@ -7,5 +7,6 @@ export default {
   username: env.RABBITMQ_DEFAULT_USER,
   password: env.RABBITMQ_DEFAULT_PASS,
   vhost: env.RABBITMQ_DEFAULT_VHOST,
+  heartbeat: 60,
   // authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL']
 };

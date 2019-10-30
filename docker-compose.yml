@@ -39,8 +39,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.125"
-          memory: 256MiB
+          cpus: "0.1"
+          memory: 512MiB
       restart_policy:
         condition: on-failure
   
@@ -59,8 +59,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.125"
-          memory: 256MiB
+          cpus: "0.1"
+          memory: 512MiB
       restart_policy:
         condition: on-failure      
   watcher:
@@ -78,8 +78,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.05"
-          memory: 256MiB
+          cpus: "0.025"
+          memory: 64MiB
       restart_policy:
         condition: on-failure
   migration:
@@ -128,8 +128,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.15"
-          memory: 512MiB
+          cpus: "0.1"
+          memory: 764MiB
       restart_policy:
         condition: any
   db:
@@ -143,7 +143,7 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.4"
+          cpus: "0.35"
           memory: 1g
       restart_policy:
         condition: on-failure

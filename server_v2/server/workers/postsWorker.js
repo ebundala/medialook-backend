@@ -72,15 +72,16 @@ const parseMediaGroup = (item) => {
       }
     });
   }
-  return enclosures.sort((a, b) => {
-    if (a.height > b.height) {
+  return enclosures;
+  /* .sort((a, b) => {
+       if (a.height * a.width < b.height * b.width) {
       return 1;
     }
     if (a.height === b.height) {
       return 0;
     }
     return -1;
-  });
+  }); */
 };
 const reflect = (p) => p.then((v) => ({ v, status: true }),
   (e) => ({ e, status: false }));
@@ -97,6 +98,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
     link,
     // eslint-disable-next-line prefer-const
     guid,
+    // eslint-disable-next-line prefer-const
     description,
     title,
     enclosures,
@@ -133,10 +135,19 @@ const buildPost = async ({ post, mediaName, feedId }) => {
       }
       if (images) {
         const probedImages = await Promise
-          .all(images.map((item) => reflect(probe(item, { timeout: 30000 }))));
+          .all(images.map((item) => reflect(probe(item, { timeout: 5000 }))));
         enclosures.push(...probedImages
-          .filter((item) => item.status)
-          .filter(({ v }) => v.width >= 200 && v.height >= 200)
+          .filter(({ v }) => v.status && v.width >= 200
+          && v.width <= 1200 && v.height >= 200 && v.height <= 1200)
+          .sort((a, b) => {
+            if (a.height * a.width < b.height * b.width) {
+              return 1;
+            }
+            if (a.height === b.height) {
+              return 0;
+            }
+            return -1;
+          })
           .map(({ v }) => ({
             type: v.mime,
             url: v.url,
@@ -161,7 +172,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
     title = replaceHtml(striptags(title));
   }
   if (summary) {
-    summary = replaceHtml(striptags(summary));
+    summary = replaceHtml(striptags(summary || description));
   }
   // if (image) {
   // image = image; // JSON.stringify(post.image);
@@ -169,9 +180,9 @@ const buildPost = async ({ post, mediaName, feedId }) => {
   /* if (post.enclosures) {
           post.enclosures = JSON.stringify(post.enclosures);
       } */
-  if (description) {
-    description = replaceHtml(striptags(description));
-  }
+  // if (description) {
+  // description = replaceHtml(striptags(description));
+  // }
   createdAt = (new Date()).toISOString();
   const now = new Date();
   try {
@@ -189,7 +200,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
   if (!author) {
     author = mediaName;
   }
-  // return  { sql, params:  };
+
   return {
     feedId,
     mediaName,
@@ -200,7 +211,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
       author,
       link,
       guid,
-      description,
+      // description,
       title,
       enclosures,
       pubDate,
@@ -220,11 +231,15 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
   .then((ch) => ch.assertQueue(POST_QUEUE)
     .then(() => ch.consume(POST_QUEUE, (msg) => {
       if (msg !== null) {
-        const str = msg.content.toString();
-        const msgObj = JSON.parse(str);
-        queue.push(msgObj);
-        ch.ack(msg);
+        try {
+          const str = msg.content.toString();
+          const msgObj = JSON.parse(str);
+          queue.push(msgObj);
+        } catch (e) {
+          debug(e);
+        }
       }
+      ch.ack(msg);
     }))).catch((e) => {
     error(e);
     debug('wait for next retry in ', timeout / 2, ' s');

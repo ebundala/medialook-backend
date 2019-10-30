@@ -19,6 +19,7 @@ const {
 } = misc;
 const queue = [];
 const queue1 = [];
+const mediasQueue = [];
 
 const fetchFeeds = (feed) => new Promise((resolve, reject) => {
   FeedParser.parseUrl(feed, TIMEOUT_IN_SEC, (e, result) => {
@@ -82,27 +83,39 @@ const mediaQueueTask = (timeout = TIMEOUT_IN_SEC) => {
     } catch (e) {
       reject(e);
     }
-  }).then((conn) => conn.createChannel()).then((ch) => {
-    timerHandle = setInterval(() => {
-      if (queue.length) {
-        ch.assertQueue(MEDIA_QUEUE).then(() => {
+  }).then((conn) => conn.createChannel())
+    .then((ch) => ch.assertQueue(MEDIA_QUEUE).then(() => {
+      timerHandle = setInterval(() => {
+        if (queue.length) {
           time('queing media');
-          ch.sendToQueue(MEDIA_QUEUE, Buffer.from(JSON.stringify(queue.pop())));
-          timeEnd('queing media');
-        });
-      }
-    }, 1000);
-  }).catch((e) => {
-    clearInterval(timerHandle);
-    error(e);
-    debug('retrying in ');
-    setTimeout(() => {
-      debug('retrying ');
-      mediaQueueTask(2 * timeout);
-    }, timeout);
-  });
-};
+          try {
+            const json = JSON.stringify(queue.shift());
+            ch.sendToQueue(MEDIA_QUEUE, Buffer.from(json));
+          } catch (e) {
+            debug(e);
+            try {
+              ch.close();
+            } catch (alreadyClosed) {
+              error(alreadyClosed);
+            }
+            clearInterval(timerHandle);
+            mediaQueueTask();
+          }
 
+          timeEnd('queing media');
+        }
+      }, 1000);
+    }))
+    .catch((e) => {
+      clearInterval(timerHandle);
+      error(e);
+      debug('retrying in ');
+      setTimeout(() => {
+        debug('retrying ');
+        mediaQueueTask(2 * timeout);
+      }, timeout);
+    });
+};
 // media consumer task
 const mediaConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, reject) => {
   try {
@@ -115,21 +128,16 @@ const mediaConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
   .then((ch) => ch.assertQueue(MEDIA_QUEUE)
     .then(() => ch.consume(MEDIA_QUEUE, (msg) => {
       if (msg !== null) {
-        const str = msg.content.toString();
-        const media = JSON.parse(str);
-        debug('Last feed updated at', media.updatedAt, media._id, media.posts, media);
-        processFeed(media)
-          .then((posts) => updateFeed(media, posts))
-          .then((posts) => {
-            debug('feed updated success');
-            queue1.push(...posts);
-            ch.ack(msg);
-          })
-          .catch((e) => {
-            debug(e);
-            ch.nack(msg, false, false);
-          });
+        try {
+          const str = msg.content.toString();
+          const media = JSON.parse(str);
+          debug('Last feed updated at', media.updatedAt, media._id);
+          mediasQueue.push(media);
+        } catch (e) {
+          debug(e);
+        }
       }
+      ch.ack(msg);
     })))
   .catch((e) => {
     error(e);
@@ -154,12 +162,24 @@ const postsProducerTask = (timeout = TIMEOUT_IN_SEC) => {
       .then(() => {
         timerHandle = setInterval(() => {
           if (queue1.length) {
-            const msg = queue1.pop();
-            // time("queing post")
-            ch.sendToQueue(POST_QUEUE, Buffer.from(JSON.stringify(msg)));
+            try {
+              const msg = queue1.shift();
+              const json = JSON.stringify(msg);
+              // time("queing post")
+              ch.sendToQueue(POST_QUEUE, Buffer.from(json));
             // timeEnd("queing post")
+            } catch (e) {
+              try {
+                ch.close();
+              } catch (err) {
+                error(err);
+              }
+              error(e);
+              clearInterval(timerHandle);
+              postsProducerTask();
+            }
           }
-        }, 500);
+        }, 250);
       })).catch((e) => {
       clearInterval(timerHandle);
       error(e);
@@ -192,6 +212,21 @@ mediaConsumerTask();
 postsProducerTask();
 // startRefreshLoop();
 let runTask = false;
+
+setInterval(() => {
+  if (mediasQueue.length) {
+    const media = mediasQueue.shift();
+    processFeed(media)
+      .then((posts) => updateFeed(media, posts))
+      .then((posts) => {
+        debug('feed updated success');
+        queue1.push(...posts);
+      })
+      .catch((e) => {
+        debug(e);
+      });
+  }
+}, 1000);
 
 setInterval(() => {
   if (runTask) {
