@@ -56,7 +56,7 @@ const importMedias = async () => {
     log(res);
   }
 };
-importMedias();
+// importMedias();
 
 const importCategories = async () => {
   const { result } = category;
@@ -124,7 +124,7 @@ const importCountries = async () => {
     log(res);
   }
 };
- // importCountries();
+// importCountries();
 
 const importPosts = () => {
   const { result } = posts;
@@ -216,29 +216,30 @@ const importComments = () => {
 
 const importSearchView = async () => {
   const view = DB.arangoSearchView('contentView');
-
-  if (!(await view.exists())) {
-    const links = {
-      Users: {
-        includeAllFields: true,
-        analyzers: ['text_en'],
-      },
-      Posts: {
-        includeAllFields: true,
-        analyzers: ['text_en'],
-      },
-      Reports: {
-        includeAllFields: true,
-        analyzers: ['text_en'],
-      },
-      Feeds: {
-        includeAllFields: true,
-        analyzers: ['text_en'],
-      },
-    };
-    const res = await view.create({ links }).catch((e) => e);
-    log(res);
+  const exist = await view.exists();
+  if (exist) {
+    await view.drop().catch((e) => e);
   }
+  const links = {
+    Users: {
+      includeAllFields: true,
+      analyzers: ['text_en'],
+    },
+    Posts: {
+      includeAllFields: true,
+      analyzers: ['text_en'],
+    },
+    Reports: {
+      includeAllFields: true,
+      analyzers: ['text_en'],
+    },
+    Feeds: {
+      includeAllFields: true,
+      analyzers: ['text_en'],
+    },
+  };
+  const res = await view.create({ links }).catch((e) => e);
+  log(res);
 };
 
-// importSearchView();
+importSearchView();

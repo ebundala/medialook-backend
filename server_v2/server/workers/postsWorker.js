@@ -46,6 +46,7 @@ const parseMediaGroup = (item) => {
   if (group && group instanceof Array) {
     group.forEach((element) => {
       const content = element['media:content'];
+      // const thumbmail = element['media:thumbnail'];
       if (content && content instanceof Array) {
         content.forEach((elem) => {
           const {
@@ -105,69 +106,108 @@ const buildPost = async ({ post, mediaName, feedId }) => {
     pubDate,
     updatedAt,
   } = post;
+  // eslint-disable-next-line no-underscore-dangle
+  if ((await DB.collection('Posts').firstExample({ link }).catch((e) => e))._id) {
+    return Promise.reject(new Error('Post already exist'));
+  }
+  const images = new Set();
+  const videos = new Set();
+  const urls = new Set();
   if ((enclosures instanceof Array && !enclosures.filter((item) => item.url).length)
           || (enclosures instanceof Array && !enclosures.length) || !enclosures) {
     debug(`post has no image\n ${post.guid}\n retrying to get from content`);
-    enclosures = parseMediaGroup(post);
-    if (!enclosures.length) {
-      const content = summary + description;
-      const imageRegex = new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
-      const videoRegex = new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
+    parseMediaGroup(post).forEach(({ url }) => {
+      if (url) { images.add(url); }
+    });
+    const content = summary + description;
+    const imageRegex = new RegExp(/(?<=<img(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
+    const videoRegex = new RegExp(/(?<=<source(.*)src=["'])(.+?)(?=["'](.*)>)/igm);
 
-      // eslint-disable-next-line max-len
-      // let imageMediaRegex=new RegExp(/(<media(.*)((medium=["'](image)["']){1}|(type=["'](image(.+))["']){1})(.*)>)/);
-      // let imageMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
+    // eslint-disable-next-line max-len
+    // let imageMediaRegex=new RegExp(/(<media(.*)((medium=["'](image)["']){1}|(type=["'](image(.+))["']){1})(.*)>)/);
+    // let imageMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
 
-      // eslint-disable-next-line max-len
-      // let videoMediaRegex=new RegExp(/(<media(.*)((medium=["'](video)["']){1}|(type=["'](video(.+))["']){1})(.*)>)/);
-      //  let videoMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
+    // eslint-disable-next-line max-len
+    // let videoMediaRegex=new RegExp(/(<media(.*)((medium=["'](video)["']){1}|(type=["'](video(.+))["']){1})(.*)>)/);
+    //  let videoMediaRegexUrl= new RegExp(/(?<=<media(.*)url=["'])(.+?)(?=["'](.*)>)/igm)
 
 
-      let images = content.toString().match(imageRegex);
-      const videos = content.toString().match(videoRegex);
-      if (image) {
-        const { url } = image;
-        if (images instanceof Array && url) { images.push(url); } else if (url) { images = [url]; }
-      }
-
-      if (!enclosures) {
-        enclosures = [];
-      }
-      if (images) {
-        const probedImages = await Promise
-          .all(images.map((item) => reflect(probe(item, { timeout: 5000 }))));
-        enclosures.push(...probedImages
-          .filter(({ v }) => v.status && v.width >= 200
-          && v.width <= 1200 && v.height >= 200 && v.height <= 1200)
-          .sort((a, b) => {
-            if (a.height * a.width < b.height * b.width) {
-              return 1;
-            }
-            if (a.height === b.height) {
-              return 0;
-            }
-            return -1;
-          })
-          .map(({ v }) => ({
-            type: v.mime,
-            url: v.url,
-            width: v.width,
-            height: v.height,
-            length: v.length,
-          })));
-      }
-      if (videos) {
-        enclosures.push(...videos.map((item) => ({
-          type: 'video',
-          url: item,
-          // "width":null,
-          //  "height":null
-        })).filter((item) => item.url && item.type));
-      }
+    const matches = content.toString().match(imageRegex);
+    if (matches) {
+      matches.forEach((url) => {
+        urls.add(url);
+      });
     }
-    debug('images found ');
-    debug(enclosures);
+    const videosMatches = content.toString().match(videoRegex);
+    if (videosMatches) {
+      videosMatches.forEach((url) => {
+        videos.add(url);
+      });
+    }
   }
+
+  if (image) {
+    const { url } = image;
+    if (url) {
+      images.add(url);
+    }
+  }
+
+  if (!enclosures) {
+    enclosures = [];
+  }
+  enclosures.forEach(({ url }) => {
+    if (url) images.add(url);
+  });
+  if (urls) {
+    urls.forEach((url) => {
+      images.add(url);
+    });
+  }
+  if (images) {
+    enclosures = [];
+    const imagesArr = [];
+    images.forEach((item) => {
+      imagesArr.push(item);
+    });
+    const probedImages = await Promise
+      .all(imagesArr.map((item) => reflect(probe(item, { timeout: 5000 }))));
+    enclosures.push(...probedImages
+      .filter(({ v, status }) => status && v.width >= 200
+          && v.width <= 1400 && v.height >= 200 && v.height <= 1400)
+      .sort((a, b) => {
+        if (a.height * a.width < b.height * b.width) {
+          return 1;
+        }
+        if (a.height * a.width === b.height * b.width) {
+          return 0;
+        }
+        return -1;
+      })
+      .map(({ v }) => ({
+        type: v.mime,
+        url: v.url,
+        width: v.width,
+        height: v.height,
+        length: v.length,
+      })));
+
+    if (videos) {
+      const videosArr = [];
+      videos.forEach((vid) => {
+        videosArr.push(vid);
+      });
+      enclosures.push(...videosArr.map((item) => ({
+        type: 'video',
+        url: item,
+        // "width":null,
+        //  "height":null
+      })).filter((item) => item.url && item.type));
+    }
+  }
+  debug('images found ');
+  debug(enclosures);
+
   if (title) {
     title = replaceHtml(striptags(title));
   }
@@ -253,11 +293,12 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
 setInterval(() => {
   if (queue.length) {
     const post = queue.shift();
-    buildPost(post).then((data) => savePostToDB(data)
+    buildPost(post)
+      .then((data) => savePostToDB(data))
       .catch((e) => {
         const { message } = e;
         error(message);
-      }));
+      });
   }
-}, 250);
+}, 100);
 postsConsumerTask();
