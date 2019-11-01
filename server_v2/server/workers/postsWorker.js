@@ -21,22 +21,16 @@ const {
   TIMEOUT_IN_SEC, POST_QUEUE,
 } = misc;
 
-const queue = [];
-
-
 const savePostToDB = (data) => {
-  const { feedId, mediaName, post } = data;
-  debug(post.author, mediaName, feedId);
+  const { feedId, post } = data;
+  // debug(post.author, mediaName, feedId);
   const col = DB.collection('Posts');
   const edgeCol = DB.edgeCollection('Publish');
   return col.save(post)
     .then((doc) => edgeCol
       // eslint-disable-next-line no-underscore-dangle
       .save({ _from: feedId, _to: doc._id }))
-    .then((err) => {
-      debug(err);
-      return err;
-    });
+    .then((res) => res);
 };
 
 
@@ -115,7 +109,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
   const urls = new Set();
   if ((enclosures instanceof Array && !enclosures.filter((item) => item.url).length)
           || (enclosures instanceof Array && !enclosures.length) || !enclosures) {
-    debug(`post has no image\n ${post.guid}\n retrying to get from content`);
+    // debug(`post has no image\n ${post.guid}\n retrying to get from content`);
     parseMediaGroup(post).forEach(({ url }) => {
       if (url) { images.add(url); }
     });
@@ -205,8 +199,8 @@ const buildPost = async ({ post, mediaName, feedId }) => {
       })).filter((item) => item.url && item.type));
     }
   }
-  debug('images found ');
-  debug(enclosures);
+  // debug('images found ');
+  // debug(enclosures);
 
   if (title) {
     title = replaceHtml(striptags(title));
@@ -247,7 +241,7 @@ const buildPost = async ({ post, mediaName, feedId }) => {
     post: {
       summary,
       createdAt,
-      image,
+      // image,
       author,
       link,
       guid,
@@ -269,17 +263,24 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
   }
 }).then((conn) => conn.createChannel())
   .then((ch) => ch.assertQueue(POST_QUEUE)
-    .then(() => ch.consume(POST_QUEUE, (msg) => {
+    .then(() => ch.prefetch(10))
+    .then(() => ch.consume(POST_QUEUE, async (msg) => {
       if (msg !== null) {
         try {
           const str = msg.content.toString();
-          const msgObj = JSON.parse(str);
-          queue.push(msgObj);
+          const post = JSON.parse(str);
+          await buildPost(post)
+            .then((data) => savePostToDB(data))
+            .catch((e) => {
+              const { message } = e;
+              error(message);
+            });
         } catch (e) {
           debug(e);
+        } finally {
+          ch.ack(msg);
         }
       }
-      ch.ack(msg);
     }))).catch((e) => {
     error(e);
     debug('wait for next retry in ', timeout / 2, ' s');
@@ -290,15 +291,4 @@ const postsConsumerTask = (timeout = TIMEOUT_IN_SEC) => new Promise((resolve, re
 
 
 // run main task
-setInterval(() => {
-  if (queue.length) {
-    const post = queue.shift();
-    buildPost(post)
-      .then((data) => savePostToDB(data))
-      .catch((e) => {
-        const { message } = e;
-        error(message);
-      });
-  }
-}, 100);
 postsConsumerTask();
