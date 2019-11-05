@@ -82,14 +82,24 @@ export default class Feeds extends ArangoDataSource {
         const media = {
           createdAt: (new Date()).toISOString(),
           mediaName: replaceHtml(feed.head.title),
-          url: feed.head.link,
+          url: feed.head.link || link,
           featuredImage: image,
           feedUrl: link,
-          feedName: replaceHtml(feed.head.title),
+          feedName: replaceHtml(feed.head.title) || link,
 
         };
-        const result = await this.feedCol.save(media, { returnNew: true })
-          .then((data) => data.new).catch((e) => {
+
+        const result = await this.feedCol.save(media)
+          .then((data) => {
+            log(data);
+            const conditions = media.feedUrl;
+            const aquery = aql`
+                  FOR doc IN Feeds
+                  FILTER doc.feedUrl == ${conditions}
+                  RETURN doc
+                  `;
+            return this.db.query(aquery).then((arr) => arr.all());
+          }).catch((e) => {
             const { message } = e;
             throw new Error(message || 'Failed to add the feed ');
           });
@@ -106,26 +116,22 @@ export default class Feeds extends ArangoDataSource {
       if (site && site.feedUrls && site.feedUrls.length) {
         const medias = site.feedUrls.map((fd) => ({
           createdAt: (new Date()).toISOString(),
-          mediaName: replaceHtml(site.site.title),
+          mediaName: replaceHtml(site.site.title) || site.site.url,
           url: site.site.url,
           featuredImage: site.site.favicon,
           feedUrl: fd.url,
           feedName: replaceHtml(fd.title || site.site.title),
-        })).map((fd) => {
-          const textIndex = `${fd.mediaName} ${fd.url} ${fd.feedUrl} ${fd.feedName}`;
-          return { textIndex, ...fd };
-        });
-        const result = await this.feedCol.save(medias, { returnNew: true }).then((data) => {
+        })).map((fd) => ({ ...fd }));
+        const result = await this.feedCol.save(medias).then((data) => {
           log(data);
-          return data.map((item) => item.new);
-          // Todo use return new instead of issuing a new query
-          /* const conditions = medias.map((fd) => fd.feedUrl);
+          // return data.map((item) => item.new);
+          const conditions = medias.map((fd) => fd.feedUrl);
           const aquery = aql`
                 FOR doc IN Feeds
                 FILTER doc.feedUrl IN ${conditions}
                 RETURN doc
                 `;
-          return this.db.query(aquery).then((arr) => arr.all()); */
+          return this.db.query(aquery).then((arr) => arr.all());
         }).catch((e) => {
           const { message } = e;
           throw new Error(message || 'Failed to add the feeds');
@@ -136,6 +142,7 @@ export default class Feeds extends ArangoDataSource {
 
       return { message: 'Nothing was found', feeds: [] };
     }
+    log('found feeds', feeds);
     return { message: 'Operation is successfull', feeds };
   }
 

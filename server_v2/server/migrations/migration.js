@@ -4,7 +4,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@babel/polyfill';
 import { log } from 'console';
-import { Database } from 'arangojs';
+// import { Database } from 'arangojs';
 import { dbConfig } from '../config/db';
 import feeds from './data/feedFull.json';
 import reports from './data/report.json';
