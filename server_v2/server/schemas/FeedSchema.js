@@ -12,7 +12,7 @@ type Feed {
     feedName: String
     countryCode: String
     feedUrl: String!
-    url: String!
+    url: String
     categoryName: String
     mediaName: String
     isFollowed: Boolean

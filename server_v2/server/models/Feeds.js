@@ -81,7 +81,7 @@ export default class Feeds extends ArangoDataSource {
         const image = feed.head.image ? feed.head.image.url : null;
         const media = {
           createdAt: (new Date()).toISOString(),
-          mediaName: replaceHtml(feed.head.title),
+          mediaName: replaceHtml(feed.head.title) || feed.head.link || link,
           url: feed.head.link || link,
           featuredImage: image,
           feedUrl: link,

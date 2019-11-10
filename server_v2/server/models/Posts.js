@@ -41,7 +41,7 @@ export default class Posts extends ArangoDataSource {
         }
         FILTER HAS(post,"title")
         `);
-      if (categoryName && categoryName !== 'Uncategorized') {
+      if (categoryName && categoryName !== 'All') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
       }
@@ -54,7 +54,7 @@ export default class Posts extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(post,{feed:p.vertices[1]})`);
       query = aql.join(q);
-    } else if (followed === false) {
+    } else if (followed === false) {      
       q.push(aql`
       LET myFeeds = (FOR feed IN 1..1 OUTBOUND 
         ${_id} Follows
@@ -76,7 +76,7 @@ export default class Posts extends ArangoDataSource {
         FILTER HAS(post,"title")
       `);
 
-      if (categoryName && categoryName !== 'Uncategorized') {
+      if (categoryName && categoryName !== 'All') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].categoryName == ${categoryName}`);
       }
@@ -91,7 +91,7 @@ export default class Posts extends ArangoDataSource {
       query = aql.join(q);
     } else {
       q.push(aql`FOR feed IN Feeds FILTER HAS(feed,"feedUrl")`);
-      if (categoryName && categoryName !== 'Uncategorized') {
+      if (categoryName && categoryName !== 'All') {
         q.push(aql`AND`);
         q.push(aql`feed.categoryName == ${categoryName}`);
       }

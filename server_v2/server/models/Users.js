@@ -311,17 +311,20 @@ export default class Users extends ArangoDataSource {
   }
 
   getUserByExample(user, args) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     let example = args;
     if (args.me) {
       example = { _id: user._id };
     }
 
-    return this.usersCol.firstExample(example).catch(() => { throw new Error('Not found'); });
+    return this.usersCol.firstExample(example).then((res) => {
+      log(res);
+      return res;
+    }).catch(() => { throw new Error('Not found'); });
   }
 
   getUsersByExample(user, args) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     if (args) {
       return this.usersCol.byExample(args).then((arr) => arr.all())
         .catch(() => { throw new Error('Not found'); });

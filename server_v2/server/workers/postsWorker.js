@@ -104,6 +104,9 @@ const buildPost = async ({ post, mediaName, feedId }) => {
   if ((await DB.collection('Posts').firstExample({ link }).catch((e) => e))._id) {
     return Promise.reject(new Error('Post already exist'));
   }
+  if (!title || !link || !feedId) {
+    return null;
+  }
   const images = new Set();
   const videos = new Set();
   const urls = new Set();
