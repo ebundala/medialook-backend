@@ -51,7 +51,7 @@ export default class Users extends ArangoDataSource {
             email: user.email,
             emailVerified: user.emailVerified,
             avator: user.photoURL,
-            role: 1,
+            role: 'SUBSCRIBER',
           })).then(async (user) => {
             const setClaims = await this._setUserClaims(user);
             if (setClaims) {
@@ -119,7 +119,7 @@ export default class Users extends ArangoDataSource {
   _setUserClaims(user) {
     return admin.auth()
       // eslint-disable-next-line no-underscore-dangle
-      .setCustomUserClaims(user._key, { linked: true, role: 1, _key: user._key })
+      .setCustomUserClaims(user._key, { role: 'SUBSCRIBER' })
       .then(() => true).catch(() => false);
   }
 
@@ -162,10 +162,10 @@ export default class Users extends ArangoDataSource {
       return admin.auth().verifyIdToken(idToken, true)
         .then(async (info) => {
           const {
-            linked, role, _key, uid,
+            role, uid,
           } = info;
 
-          if (linked && role && _key === uid) {
+          if (role) {
             throw new Error('Provided token is already linked to a user');
           } else if (!isLength(username, 3)) {
             throw new Error('Username must be 3 characters or more');
@@ -199,7 +199,7 @@ export default class Users extends ArangoDataSource {
                   email,
                   emailVerified,
                   avator: photoURL,
-                  role: 1,
+                  role: 'SUBSCRIBER',
                 }).catch((error) => error);
 
                 if (auser instanceof Error) {
@@ -225,7 +225,7 @@ export default class Users extends ArangoDataSource {
   }
 
   async updateProfile(user, profile, avatorFile, coverFile) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     const userData = {};
 
 
@@ -348,6 +348,7 @@ export default class Users extends ArangoDataSource {
 
   follow({ _id }, { to, type }) {
     this.isLogedIn(_id);
+    if (_id === to) throw Error('Can not follow yourself');
     const createdAt = (new Date()).toISOString();
     const q = aql`RETURN DOCUMENT(${to})`;
     if (type === 'DO') {
@@ -481,7 +482,7 @@ export default class Users extends ArangoDataSource {
   }
 
   categories(user) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     const query = aql`
   FOR category IN Categories
   SORT category.importance DESC
@@ -494,7 +495,7 @@ export default class Users extends ArangoDataSource {
   }
 
   countries(user) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     const query = aql`
   FOR val IN Countries
   SORT val.admin ASC
@@ -507,7 +508,7 @@ export default class Users extends ArangoDataSource {
   }
 
   tags(user) {
-    this.isLogedIn(user);
+    this.isLogedIn(user._id);
     const query = aql`
   FOR val IN Tags
   SORT val.importance DESC
@@ -518,10 +519,6 @@ export default class Users extends ArangoDataSource {
         const { message } = e;
         throw new Error(message || 'Failed to get tags');
       });
-  }
-
-  isLogedIn(user) {
-    if (!user) throw new Error('User is not logged in');
   }
 
   followers({ _id }, { offset, limit }) {
@@ -555,7 +552,6 @@ export default class Users extends ArangoDataSource {
   }
 
   usersRecommendations({ _id }, { offset, limit }) {
-    log(_id);
     this.isLogedIn(_id);
     // TODO just load users not followed for now later use interest based
     const query = aql`
@@ -595,6 +591,29 @@ export default class Users extends ArangoDataSource {
       .catch((e) => {
         const { message } = e;
         throw new Error(message || 'Failed to get feeds recommendations');
+      });
+  }
+
+  role(user, { email, role }) {
+    if (!user._id && (user.role !== 'ADMIN' || user.role !== 'DEVELOPER')) {
+      throw new Error('You dont have permission to perform this task');
+    }
+    if (!email || !isEmail(email)) throw new Error('Invalid user email');
+    if (!role || (role !== 'SUBSCRIBER' && role !== 'EDITOR'
+    && role !== 'MODERATOR' && role !== 'ADMIN'
+    && role !== 'DEVELOPER')) throw new Error('Invalid role');
+
+    return admin.auth().getUserByEmail(email)
+      .then((auser) => {
+        const { uid } = auser;
+        return admin.auth().setCustomUserClaims(uid, { role })
+          .then(() => this.usersCol.update({ _key: uid }, { role },
+            { returnNew: true, mergeObjects: true }))
+          .then((res) => ({ message: 'User role changed successfully', user: res.new }))
+          .catch((e) => {
+            const { message } = e;
+            throw new Error(message || 'Unknown error occured');
+          });
       });
   }
 

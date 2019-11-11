@@ -36,8 +36,8 @@ export const idTokenAuth = async (req) => {
   }
   return {};
 };
-export const isLinked = ({ linked, _key }) => {
-  if (linked === true && _key) {
+export const isLinked = ({ role, sub }) => {
+  if (role && sub) {
     return true;
   }
   return false;

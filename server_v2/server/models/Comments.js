@@ -12,7 +12,7 @@ export default class Comments extends ArangoDatasource {
   }
 
   async comment({ _id }, { subject, commentText }) {
-    if (!_id) throw GraphQLError('User is not loged in');
+    this.isLogedIn(_id);
     const createdAt = (new Date()).toISOString();
     const returnNew = true;
     return this.commentCol.save({ createdAt, commentText }, _id, subject, { returnNew })
@@ -29,7 +29,7 @@ export default class Comments extends ArangoDatasource {
   }
 
   async editComment(user, { _id, commentText }) {
-    if (!user) throw new GraphQLError('User is not loged in');
+    this.isLogedIn(user._id);
     const updatedAt = (new Date()).toISOString();
     const returnNew = true;
     return this.commentCol.update(_id, { updatedAt, commentText }, { returnNew })
@@ -50,7 +50,7 @@ export default class Comments extends ArangoDatasource {
   }
 
   async deleteComment(user, { _id }) {
-    if (!user) throw new GraphQLError('User is not loged in');
+    this.isLogedIn(user._id);
     return this.commentCol.remove(_id, { returnOld: true })
       .then(() => ({ message: 'Comment deleted succsessfully', _id }))
       .catch((e) => {
@@ -60,7 +60,7 @@ export default class Comments extends ArangoDatasource {
   }
 
   getComments(user, { _id, offset, limit }) {
-    if (!user) throw new GraphQLError('User is not loged in');
+    this.isLogedIn(user._id);
     if (!_id || offset === undefined || limit === undefined) throw new GraphQLError('Invalid query missing required data');
 
     const query = aql`

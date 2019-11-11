@@ -22,6 +22,7 @@ export default class Feeds extends ArangoDataSource {
   }
 
   getFeeds(user, { input }) {
+    this.isLogedIn(user._id);
     return this.feedCol.byExample(input)
       .then((arr) => arr.all());
   }
@@ -47,8 +48,9 @@ export default class Feeds extends ArangoDataSource {
     });
   }
 
-  async addFeed(user, { query, offset, limit }) {
-    if (!user) throw new Error('User is not loged in');
+  async addFeed({ role }, { query, offset, limit }) {
+    log('user has role ', role);
+    this.isAdmin(role);
     if (!query) throw new Error('No search term provided');
     const q = `%${query.toString().toLowerCase()}%`;
     const aq = aql`
@@ -182,12 +184,12 @@ export default class Feeds extends ArangoDataSource {
     throw new Error('Invalid Operation');
   }
 
-  async editFeed({ isAdmin }, {
+  async editFeed({ role }, {
     _id,
     categoryName, countryCode,
     feedUrl, url, mediaName, feedName, featuredImage,
   }) {
-    if (!isAdmin) throw new Error('User has no permission to edit feed');
+    this.isAdmin(role);
     const data = {};
     if (categoryName) data.categoryName = categoryName;
     if (countryCode) data.countryCode = countryCode;
@@ -207,8 +209,8 @@ export default class Feeds extends ArangoDataSource {
     return { message: 'Feed updated successfully', feed };
   }
 
-  async deleteFeed({ isAdmin }, { _id }) {
-    if (!isAdmin) throw new Error('User has no permission to delete a feed');
+  async deleteFeed({ role }, { _id }) {
+    this.isAdmin(role);
     if (!await this.feedCol.documentExists(_id)) throw new Error('Feed doesnt exist');
 
     const query = aql`

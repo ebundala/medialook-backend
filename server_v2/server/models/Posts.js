@@ -12,7 +12,7 @@ export default class Posts extends ArangoDataSource {
   getPosts({ _id }, {
     categoryName, countryCode, id, feedId, offset, limit, followed,
   }) {
-    if (!_id) throw new Error('User is not logged in');
+    this.isLogedIn(_id);
     const q = [];
     let query;
     if (id) {
@@ -54,7 +54,7 @@ export default class Posts extends ArangoDataSource {
       LIMIT ${offset},${limit}
       RETURN MERGE(post,{feed:p.vertices[1]})`);
       query = aql.join(q);
-    } else if (followed === false) {      
+    } else if (followed === false) {
       q.push(aql`
       LET myFeeds = (FOR feed IN 1..1 OUTBOUND 
         ${_id} Follows

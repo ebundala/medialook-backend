@@ -61,3 +61,6 @@ export const usersRecommendations = (root, { input },
 
 export const feedsRecommendations = (root, { input },
   { dataSources, user }, info) => dataSources.users.feedsRecommendations(user, input);
+
+export const role = (root, { input },
+  { dataSources, user }, info) => dataSources.users.role(user, input);

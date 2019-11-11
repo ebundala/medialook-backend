@@ -16,7 +16,7 @@ type User {
     email: String!
     emailVerified: String
     disabled: Boolean
-    isAdmin: Boolean
+    role: Roles
     isFollowed: Boolean
     isLiked: Boolean
     isCommented: Boolean
@@ -125,6 +125,24 @@ input SearchInput {
     query: String!
     offset: Int!
     limit: Int!
+}
+enum Roles{
+    DEVELOPER
+    ADMIN
+    MODERATOR
+    EDITOR
+    SUBSCRIBER
+}
+input RoleInput{
+    email: String!
+    role: Roles!
+}
+type RoleResult{
+    message: String
+    user: User
+}
+extend type Mutation{
+    role(input:RoleInput!):RoleResult
 }
 extend type Query {
     search(input: SearchInput!,type: String): [Content]

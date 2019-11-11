@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { DataSource } from 'apollo-datasource';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import crypto from 'crypto';
@@ -43,6 +44,14 @@ export default class ArangoDataSource extends DataSource {
       return type;
     }
     return null;
+  }
+
+  isLogedIn(_id) {
+    if (!_id) throw new Error('Your not logged in');
+  }
+
+  isAdmin(role) {
+    if (role !== 'ADMIN' && role !== 'DEVELOPER') throw new Error('You dont have permission to perform this task');
   }
 
   cacheQuery(ttl = 5, query) {

@@ -8,7 +8,7 @@ export default class Notifications extends ArangoDatasource {
   }
 
   getNotifications({ _id }, { offset, limit }) {
-    if (!_id) throw new Error('User is not logedin');
+    this.isLogedIn(_id);
     const q = aql`
     FOR subject, e, p IN 1..2 ANY ${_id} Follows,Comment,\`Like\`,Reported
     OPTIONS {

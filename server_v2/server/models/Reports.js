@@ -28,7 +28,7 @@ export default class Reports extends ArangoDataSource {
     text,
     tagName,
   }, file) {
-    if (!_id) throw new GraphQLError('User is not loged in');
+    this.isLogedIn(_id);
 
     if (!file) throw new Error('Missing media content');
     const {
@@ -88,7 +88,7 @@ export default class Reports extends ArangoDataSource {
     text,
     tagName,
   }) {
-    if (!user._id) throw new GraphQLError('User not loged in');
+    this.isLogedIn(user._id);
     const data = {};
     if (!_id || !(await this.reportCol.documentExists(_id))) { throw new Error('Requested report doesnt exist'); }
     if (country) data.country = country;
@@ -113,7 +113,7 @@ export default class Reports extends ArangoDataSource {
   }
 
   async deleteReport(user, { _id }) {
-    if (!user) throw new GraphQLError('User is not loged in');
+    this.isLogedIn(user._id);
     if (!await this.reportCol.documentExists(_id)) throw new GraphQLError('Report doesnt exist');
     const query = aql`
     let reported = ( FOR author,e IN 1..1 INBOUND ${_id} Reported return e)
@@ -146,7 +146,7 @@ export default class Reports extends ArangoDataSource {
   }) {
     const q = [];
     let query;
-    if (!_id) throw new Error('User is not loged in');
+    this.isLogedIn(_id);
     if (id) {
       query = aql`FOR user,e,p IN 1..1 INBOUND ${id} Reported
       RETURN MERGE(p.vertices[0],{author:user})

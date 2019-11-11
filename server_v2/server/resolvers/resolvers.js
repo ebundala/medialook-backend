@@ -19,6 +19,7 @@ import {
   followings,
   usersRecommendations,
   feedsRecommendations,
+  role,
 } from './users/UsersResolvers';
 import
 {
@@ -98,6 +99,7 @@ const resolvers = {
     editComment,
     follow,
     like,
+    role,
   },
   Content: {
     // eslint-disable-next-line no-underscore-dangle
