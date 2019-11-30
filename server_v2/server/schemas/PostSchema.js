@@ -6,9 +6,9 @@ type Post {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
-    updatedAt: String
-    pubDate: String!
+    createdAt: String @timestamp
+    updatedAt: String @timestamp
+    pubDate: String! @timestamp
     summary: String
     description: String
     title: String!
@@ -34,9 +34,19 @@ input PostQueryInput {
     followed: Boolean
     feedId: ID
     offset: Int!
+    cursor: String
     limit: Int!
 }
+type PageInfo{
+    nextCursor: String
+    hasNext: Boolean
+}
+type PostPayload{
+    posts:[Post]
+    count: Int
+    pageInfo: PageInfo
+}
 extend type Query {
-    getPosts(input: PostQueryInput!): [Post]
+    getPosts(input: PostQueryInput!): PostPayload
 }
 `;

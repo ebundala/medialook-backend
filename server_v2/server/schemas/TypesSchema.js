@@ -18,4 +18,5 @@ type DeletePayload{
 # union Subject = Report | Post  
 union Content = User | Feed | Post | Report | Comment
 
+directive @timestamp on FIELD_DEFINITION
 `;

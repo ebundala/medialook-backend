@@ -19,10 +19,15 @@ import isFollowedLoader from '../dataloaders/isFollowedLoader';
 import isCommentedLoader from '../dataloaders/isCommentedLoader';
 import authorLoader from '../dataloaders/authorLoader';
 import feedLoader from '../dataloaders/feedLoader';
+// derectives
+import timestamp from '../directives/timestamp';
 
 export default new ApolloServer({
   typeDefs,
   resolvers,
+  schemaDirectives: {
+    timestamp,
+  },
   context: async ({ req }) => {
     const user = await sessionTokenAuth(req);
     return {

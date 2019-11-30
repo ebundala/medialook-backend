@@ -5,8 +5,8 @@ type User {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
-    updatedAt: String
+    createdAt: String @timestamp
+    updatedAt: String @timestamp
     username: String!
     displayName: String
     phoneNumber: String

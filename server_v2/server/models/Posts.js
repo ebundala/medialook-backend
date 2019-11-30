@@ -10,7 +10,7 @@ export default class Posts extends ArangoDataSource {
   }
 
   getPosts({ _id }, {
-    categoryName, countryCode, id, feedId, offset, limit, followed,
+    categoryName, countryCode, id, feedId, offset, limit, followed, cursor,
   }) {
     this.isLogedIn(_id);
     const q = [];
@@ -21,17 +21,23 @@ export default class Posts extends ArangoDataSource {
       RETURN MERGE(p.vertices[0],{feed:feed})
       `;
     } else if (feedId) {
-      query = aql`
+      q.push(aql`
       FOR post,e,p IN 1..1 OUTBOUND ${feedId} Publish 
         OPTIONS {
         bfs:true,
         uniqueVertices: 'global',
         uniqueEdges: 'path'
-        }
-        SORT post.pubDate DESC
+        }`);
+
+      if (cursor && cursor.length) {
+        q.push(aql`FILTER`);
+        q.push(aql`post.pubDate > ${cursor}`);
+      }
+      q.push(aql`SORT post.pubDate DESC
         LIMIT ${offset},${limit}
         RETURN MERGE(post,{feed:p.vertices[0]})
-    `;
+       `);
+      query = aql.join(q);
     } else if (followed === true) {
       q.push(aql`FOR post,e,p IN 2..2 OUTBOUND ${_id} Follows, Publish 
         OPTIONS {
@@ -48,6 +54,10 @@ export default class Posts extends ArangoDataSource {
       if (countryCode && countryCode !== '🌎') {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
+      }
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`post.pubDate < ${cursor}`);
       }
       q.push(aql`
       SORT post.pubDate DESC
@@ -84,6 +94,10 @@ export default class Posts extends ArangoDataSource {
         q.push(aql`AND`);
         q.push(aql`p.vertices[1].countryCode == ${countryCode}`);
       }
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`post.pubDate < ${cursor}`);
+      }
       q.push(aql` 
       SORT post.pubDate DESC
       LIMIT ${offset},${limit}
@@ -108,6 +122,10 @@ export default class Posts extends ArangoDataSource {
         }   
         FILTER HAS(post,"title")
       `);
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`post.pubDate < ${cursor}`);
+      }
       q.push(aql` 
       SORT post.pubDate DESC
       LIMIT ${offset},${limit}
@@ -115,6 +133,18 @@ export default class Posts extends ArangoDataSource {
       query = aql.join(q);
     }
     return this.db.query(query).then((arr) => arr.all())
+      .then((posts) => {
+        if (posts.length) {
+          const count = posts.length;
+
+          const pageInfo = {
+            nextCursor: posts[count - 1].pubDate,
+            hasNext: limit === posts.length,
+          };
+          return { posts, count, pageInfo };
+        }
+        return { posts: [], count: 0, pageInfo: { nextCursor: null, hasNext: false } };
+      })
       .catch((e) => {
         const { message } = e;
         throw new Error(message || 'Failed to fetch news posts');

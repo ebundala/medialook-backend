@@ -141,6 +141,7 @@ export default class Reports extends ArangoDataSource {
     isoCountryCode,
     tagName,
     followed,
+    cursor,
     offset,
     limit,
   }) {
@@ -152,16 +153,21 @@ export default class Reports extends ArangoDataSource {
       RETURN MERGE(p.vertices[0],{author:user})
       `;
     } else if (userId) {
-      query = aql`
+      q.push(aql`
       FOR report,e,p IN 1..1 OUTBOUND ${userId} Reported
       OPTIONS {
       bfs:true,
       uniqueVertices: 'global',
       uniqueEdges: 'path'
+      }`);
+      if (cursor && cursor.length) {
+        q.push(aql`FILTER`);
+        q.push(aql`report.createdAt < ${cursor}`);
       }
-      SORT report.createdAt DESC
-      LIMIT ${offset},${limit}
-      RETURN MERGE(report,{author:p.vertices[0]})`;
+      q.push(aql`SORT report.createdAt DESC
+        LIMIT ${offset},${limit}
+        RETURN MERGE(report,{author:p.vertices[0]})`);
+      query = aql.join(q);
     } else if (followed === true) {
       q.push(aql`
       FOR report,e,p IN 1..2 OUTBOUND ${_id} Follows, Reported
@@ -179,6 +185,10 @@ export default class Reports extends ArangoDataSource {
       if (tagName) {
         q.push(aql.literal` AND `);
         q.push(aql`report.tagName == ${tagName}`);
+      }
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`report.createdAt < ${cursor}`);
       }
       q.push(aql`
       SORT report.createdAt DESC
@@ -213,6 +223,10 @@ export default class Reports extends ArangoDataSource {
         q.push(aql.literal`AND`);
         q.push(aql`report.tagName == ${tagName}`);
       }
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`report.createdAt < ${cursor}`);
+      }
       q.push(aql`
        SORT report.createdAt DESC
        LIMIT ${offset},${limit}
@@ -237,6 +251,10 @@ export default class Reports extends ArangoDataSource {
         q.push(aql.literal` AND `);
         q.push(aql`report.tagName == ${tagName}`);
       }
+      if (cursor && cursor.length) {
+        q.push(aql`AND`);
+        q.push(aql`report.createdAt < ${cursor}`);
+      }
       q.push(aql`
       SORT report.createdAt DESC
       LIMIT ${offset},${limit}
@@ -244,9 +262,22 @@ export default class Reports extends ArangoDataSource {
       query = aql.join(q);
     }
 
-    return this.db.query(query).then((arr) => arr.all()).catch((e) => {
-      const { message } = e;
-      throw new GraphQLError(message || 'Failed to get report');
-    });
+    return this.db.query(query).then((arr) => arr.all())
+      .then((reports) => {
+        if (reports.length) {
+          const count = reports.length;
+
+          const pageInfo = {
+            nextCursor: reports[count - 1].createdAt,
+            hasNext: limit === reports.length,
+          };
+          return { reports, count, pageInfo };
+        }
+        return { reports: [], count: 0, pageInfo: { nextCursor: null, hasNext: false } };
+      })
+      .catch((e) => {
+        const { message } = e;
+        throw new GraphQLError(message || 'Failed to get report');
+      });
   }
 }

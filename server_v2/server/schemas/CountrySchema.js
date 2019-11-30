@@ -5,8 +5,8 @@ type Country {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
-    updatedAt: String
+    createdAt: String @timestamp
+    updatedAt: String @timestamp
     countryName: String!
     admin: String
     iso2: String

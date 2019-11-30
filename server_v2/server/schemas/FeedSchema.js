@@ -6,8 +6,8 @@ type Feed {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
-    updatedAt: String
+    createdAt: String @timestamp
+    updatedAt: String @timestamp
     featuredImage: String
     feedName: String
     countryCode: String

@@ -5,8 +5,8 @@ type Category {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
-    updatedAt: String
+    createdAt: String @timestamp
+    updatedAt: String @timestamp
     categoryName: String!
     importance: Int!
 }

@@ -22,7 +22,7 @@ type Comment {
     _from: String!
     _to: String!
     commentText: String!
-    createdAt: String
+    createdAt: String @timestamp
 }
 input CommentQuery{
     _id: ID!    

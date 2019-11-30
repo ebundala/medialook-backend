@@ -5,7 +5,7 @@ type NotificationAction {
     _id: ID!
     _from: String!
     _to: String!
-    createdAt: String
+    createdAt: String @timestamp
     commentText: String
 }
 type Notification{

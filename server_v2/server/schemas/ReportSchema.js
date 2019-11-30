@@ -6,7 +6,7 @@ type Report {
     _id: ID!
     _key: String!
     _rev: String!
-    createdAt: String
+    createdAt: String @timestamp
     country: String
     altitude: Float
     latitude: Float
@@ -78,6 +78,7 @@ input ReportQueryInput {
     tagName: String
     followed: Boolean
     isoCountryCode: String
+    cursor: String
     offset: Int!
     limit: Int!
 }
@@ -104,8 +105,12 @@ extend type Mutation {
     deleteReport(input: DeleteInput!): DeletePayload
     singleUpload(file:Upload!):File!
 }
-
+type ReportResultPayload{
+    reports:[Report]
+    count: Int
+    pageInfo: PageInfo
+}
 extend type Query{
-    getReports(input: ReportQueryInput!): [Report]
+    getReports(input: ReportQueryInput!): ReportResultPayload
 }
 `;
