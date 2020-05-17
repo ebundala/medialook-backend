@@ -3,7 +3,7 @@
 import '@babel/polyfill';
 import FeedParser from 'davefeedread';
 import amqplib from 'amqplib';
-// import striptags from 'striptags';
+import { aql } from 'arangojs';
 import Express from 'express';
 import {
   debug, error, time, timeEnd,
@@ -55,17 +55,18 @@ const processFeed = (feed) => fetchFeeds(feed.feedUrl)
       mediaName: feed.mediaName,
       post,
     })).filter((value) => {
-      if (!feed.posts) {
+      /* if (!feed.posts) {
       //  debug('new media processing');
         return true;
-      }
+      } */
       // debug('non new media processing');
       const { post } = value;
       if (post.pubdate && feed.updatedAt) {
         const pubDate = (new Date(post.pubDate)).getTime();
         const lastUpdate = (new Date(feed.updatedAt)).getTime() - REFRESH_TIME_CYCLE;
         const now = (new Date()).getTime();
-        return pubDate > lastUpdate && pubDate > (now - (60 * 60 * 24 * 31 * 1000));
+        // todo use enveronment variables to change the TTL of posts
+        return pubDate > lastUpdate && pubDate > (now - (60 * 60 * 24 * 14 * 1000));
       }
       return false;
     });
@@ -172,6 +173,27 @@ const startRefreshLoop = async () => {
   }
   // setTimeout(() => {}, REFRESH_TIME_CYCLE);
 };
+
+const cleanOldPost = () => {
+  const date = (new Date((new Date()).getTime() - (60 * 60 * 24 * 14 * 1000))).toISOString();
+  const q = aql`LET records = (FOR post IN Posts
+    FILTER post.pubDate < ${date}
+    let published = ( FOR author,e IN 1..1 INBOUND post Publish  return e)
+    let comments = (FOR author,e IN 1..1 INBOUND post Comment  return e)
+    let likes = (FOR author,e IN 1..1 INBOUND post \`Like\`   return e)
+    return {published,comments,likes,post})
+    let cm = ( FOR rec IN records FOR d IN rec.comments REMOVE d IN Comment )
+    let pb = (FOR rec IN records FOR d IN rec.published REMOVE d IN Publish )
+    let lk = (FOR rec IN records FOR d IN rec.likes REMOVE d IN \`Like\` )
+    FOR p IN records
+    REMOVE p.post IN Posts Return p.post._id
+    `;
+  return DB.query(q).then((res) => res.all())
+    .then((ids) => debug(ids)).catch((e) => {
+      const { message } = e;
+      debug(message || 'Error cleaning up old posts');
+    });
+};
 // run main tasks
 // mediaQueueTask();
 mediaConsumerTask();
@@ -179,15 +201,21 @@ mediaConsumerTask();
 // startRefreshLoop();
 let runTask = false;
 
-setInterval(() => {
-  if (runTask) {
-    runTask = false;
-    startRefreshLoop();
-  }
-}, 15000);
-
 app.get('/refresh', (req, res) => {
   runTask = true;
+  setTimeout(() => {
+    if (runTask) {
+      runTask = false;
+      startRefreshLoop();
+    }
+  }, 5000);
+  res.json({ message: 'ok' });
+});
+
+app.get('/clean', (req, res) => {
+  setTimeout(() => {
+    cleanOldPost();
+  }, 5000);
   res.json({ message: 'ok' });
 });
 
